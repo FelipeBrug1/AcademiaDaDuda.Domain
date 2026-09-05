@@ -1,40 +1,34 @@
-﻿//  Felipe Antonio Brüggemann
+﻿//Felipe Antonio Brüggemann
+
 using AcademiaDaDuda.Domain.Common;
+using AcademiaDaDuda.Domain.Entities;
 
 namespace AcademiaDaDuda.Domain.Entities;
 
-public class AcessoColaborador : Entity
+public class AcessoColaborador : Entity, IAggregateRoot
 {
-    public Colaborador Colaborador { get; private set; }
-    public DateTime DataHoraChegada { get; private set; }
-    public DateTime? DataHoraSaida { get; private set; }
+    public int ColaboradorId { get; private set; }
+    public DateTime DataHora { get; private set; }
 
-    private AcessoColaborador(int id, Colaborador colaborador, DateTime dataHoraChegada, DateTime? dataHoraSaida = null) : base(id)
+    private AcessoColaborador(int id, int colaboradorId, DateTime dataHora) : base(id)
     {
-        Colaborador = colaborador;
-        DataHoraChegada = dataHoraChegada;
-        DataHoraSaida = dataHoraSaida;
+        ColaboradorId = colaboradorId;
+        DataHora = dataHora;
     }
 
-    public static Result<AcessoColaborador> CriarEntrada(int id, Colaborador colaborador)
+    public static Result<AcessoColaborador> Criar(int id, Colaborador colaborador, DateTime dataHora)
     {
         var notifications = new List<Notification>();
 
         if (colaborador == null)
-            notifications.Add(new Notification("Colaborador", "COLABORADOR_OBRIGATORIO"));
+            notifications.Add(new Notification("Colaborador", "COLABORADOR_INVALIDO"));
+
+        if (dataHora.TimeOfDay < new TimeSpan(6, 0, 0) || dataHora.TimeOfDay > new TimeSpan(22, 0, 0))
+            notifications.Add(new Notification("DataHora", "DATA_HORA_INTERVALO_INVALIDO"));
 
         if (notifications.Count != 0)
             return Result<AcessoColaborador>.Failure(notifications);
 
-        return Result<AcessoColaborador>.Success(new AcessoColaborador(id, colaborador!, DateTime.Now));
-    }
-
-    public Result<AcessoColaborador> RegistrarSaida()
-    {
-        if (DataHoraSaida.HasValue)
-            return Result<AcessoColaborador>.Failure("AcessoColaborador", "SAIDA_JA_REGISTRADA");
-
-        DataHoraSaida = DateTime.Now;
-        return Result<AcessoColaborador>.Success(this);
+        return Result<AcessoColaborador>.Success(new AcessoColaborador(id, colaborador!.Id, dataHora));
     }
 }

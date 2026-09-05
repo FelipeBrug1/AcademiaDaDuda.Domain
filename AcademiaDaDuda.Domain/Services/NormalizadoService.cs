@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿// Felipe Antonio Brüggemann
+
+using System.Text.RegularExpressions;
 
 namespace AcademiaDaDuda.Domain.Services;
 

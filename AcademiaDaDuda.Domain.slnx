@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="AcademiaDaDuda.Domain.Tests/AcademiaDaDuda.Domain.Tests.csproj" Id="56ce0ff6-f06c-4e75-99d8-0d9745cb5de9" />
   <Project Path="AcademiaDaDuda.Domain/AcademiaDaDuda.Domain.csproj" />
 </Solution>

@@ -1,20 +1,21 @@
 ﻿//  Felipe Antonio Brüggemann
 using AcademiaDaDuda.Domain.Common;
-using AcademiaDaDuda.Domain.ValueObjects;
+using AcademiaDaDuda.Domain.Entities;
 using AcademiaDaDuda.Domain.Services;
+using AcademiaDaDuda.Domain.ValueObjects;
 
 namespace AcademiaDaDuda.Domain.Entities;
 
-public sealed class Logradouro : Entity
+public sealed class Logradouro : Entity, IAggregateRoot
 {
-    public ValueObjects.Cep Cep { get; }
+    public Cep Cep { get; }
     public string Nome { get; }
     public string Bairro { get; }
     public string Cidade { get; }
     public string Estado { get; }
     public string Pais { get; }
 
-    private Logradouro(int id, ValueObjects.Cep cep, string nome, string bairro, string cidade, string estado, string pais) : base(id)
+    private Logradouro(int id, Cep cep, string nome, string bairro, string cidade, string estado, string pais) : base(id)
     {
         Cep = cep;
         Nome = nome;
@@ -31,30 +32,20 @@ public sealed class Logradouro : Entity
         var cepResult = ValueObjects.Cep.Criar(cep);
         if (cepResult.IsFailure) notifications.AddRange(cepResult.Notifications);
 
-        if (NormalizadoService.TextoVazioOuNulo(nome))
-            notifications.Add(new Notification("Nome", "NOME_OBRIGATORIO"));
-        else
-            nome = NormalizadoService.LimparEspacos(nome);
+        if (NormalizadoService.TextoVazioOuNulo(nome)) notifications.Add(new Notification("Nome", "NOME_OBRIGATORIO"));
+        else nome = NormalizadoService.LimparEspacos(nome);
 
-        if (NormalizadoService.TextoVazioOuNulo(bairro))
-            notifications.Add(new Notification("Bairro", "BAIRRO_OBRIGATORIO"));
-        else
-            bairro = NormalizadoService.LimparEspacos(bairro);
+        if (NormalizadoService.TextoVazioOuNulo(bairro)) notifications.Add(new Notification("Bairro", "BAIRRO_OBRIGATORIO"));
+        else bairro = NormalizadoService.LimparEspacos(bairro);
 
-        if (NormalizadoService.TextoVazioOuNulo(cidade))
-            notifications.Add(new Notification("Cidade", "CIDADE_OBRIGATORIO"));
-        else
-            cidade = NormalizadoService.LimparEspacos(cidade);
+        if (NormalizadoService.TextoVazioOuNulo(cidade)) notifications.Add(new Notification("Cidade", "CIDADE_OBRIGATORIO"));
+        else cidade = NormalizadoService.LimparEspacos(cidade);
 
-        if (NormalizadoService.TextoVazioOuNulo(estado))
-            notifications.Add(new Notification("Estado", "ESTADO_OBRIGATORIO"));
-        else
-            estado = NormalizadoService.ParaMaiusculo(NormalizadoService.LimparTodosEspacos(estado));
+        if (NormalizadoService.TextoVazioOuNulo(estado)) notifications.Add(new Notification("Estado", "ESTADO_OBRIGATORIO"));
+        else estado = NormalizadoService.ParaMaiusculo(NormalizadoService.LimparTodosEspacos(estado));
 
-        if (NormalizadoService.TextoVazioOuNulo(pais))
-            notifications.Add(new Notification("Pais", "PAIS_OBRIGATORIO"));
-        else
-            pais = NormalizadoService.LimparEspacos(pais);
+        if (NormalizadoService.TextoVazioOuNulo(pais)) notifications.Add(new Notification("Pais", "PAIS_OBRIGATORIO"));
+        else pais = NormalizadoService.LimparEspacos(pais);
 
         if (notifications.Count != 0)
             return Result<Logradouro>.Failure(notifications);
