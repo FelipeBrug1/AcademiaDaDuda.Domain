@@ -1,5 +1,7 @@
 ﻿//  Felipe Antonio Brüggemann
 
+using AcademiaDaDuda.Domain.Exceptions;
+
 namespace AcademiaDaDuda.Domain.Entities
 {
     public abstract class Entity
