@@ -1,6 +1,7 @@
-﻿//  Felipe Antonio Brüggemann
+﻿// Felipe Antonio Brüggemann
 using AcademiaDaDuda.Domain.Entities;
 using AcademiaDaDuda.Domain.ValueObjects;
+
 
 namespace AcademiaDaDuda.Domain.Tests.ValueObjects;
 
@@ -134,7 +135,7 @@ public class ValueObjectsTests
     [Theory(DisplayName = "Telefone: dígitos inválidos -> TELEFONE_DIGITOS")]
     [InlineData("1234")]
     [InlineData("(1)2345")]
-    [InlineData("1191234567")]
+    [InlineData("119123456")]
     [InlineData("119123456789")]
     public void Deve_Falhar_Criacao_Quando_TelefoneDigitosInvalidos(string input)
     {

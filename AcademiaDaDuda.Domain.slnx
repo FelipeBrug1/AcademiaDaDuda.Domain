@@ -1,4 +1,6 @@
 <Solution>
   <Project Path="AcademiaDaDuda.Domain.Tests/AcademiaDaDuda.Domain.Tests.csproj" Id="56ce0ff6-f06c-4e75-99d8-0d9745cb5de9" />
   <Project Path="AcademiaDaDuda.Domain/AcademiaDaDuda.Domain.csproj" />
+  <Project Path="AcademiaDaDuda.Infrastructure.Tests/AcademiaDaDuda.Infrastructure.Tests.csproj" Id="ecfbb57a-4001-4e51-a656-4519447d1686" />
+  <Project Path="AcademiaDaDuda.Infrastructure/AcademiaDaDuda.Infrastructure.csproj" Id="b7933c43-3856-4cc0-b808-8c9eeb856218" />
 </Solution>
