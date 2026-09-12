@@ -6,7 +6,7 @@ using AcademiaDaDuda.Domain.ValueObjects;
 using AcademiaDaDuda.Infrastructure.Data;
 using AcademiaDaDuda.Infrastructure.Exceptions;
 using AcademiaDaDuda.Infrastructure.Repositories;
-using AcademiaDaDuda.Infrastructure.Tests;
+
 using Xunit;
 
 namespace AcademiaDaDuda.Infrastructure.Tests;
@@ -29,14 +29,14 @@ public class ColaboradorInfrastructureTests : TestBase
 
         var colaboradorResult = Colaborador.Criar(
             id: 0,
-            nome: "Colaborador Alisson " + Guid.NewGuid().ToString("N")[..5],
+            nome: "Colaborador Felipe " + Guid.NewGuid().ToString("N")[..5],
             cpf: GerarCpf(),
             dataNascimento: new DateOnly(1995, 5, 15),
             telefone: GerarTelefone(),
             email: GerarEmail(),
             endereco: logradouro,
             numero: "200",
-            complemento: "Assis",
+            complemento: "Brüggemann",
             senha: $"SenhaValida123{dbType}",
             foto: foto,
             dataAdmissao: new DateOnly(2023, 1, 1),
@@ -60,7 +60,7 @@ public class ColaboradorInfrastructureTests : TestBase
         Assert.NotNull(obtido);
         Assert.Equal(colaborador.Id, obtido.Id);
         Assert.Equal(colaborador.Nome, obtido.Nome);
-        Assert.Equal("Assis", obtido.Endereco.Complemento);
+        Assert.Equal("Brüggemann", obtido.Endereco.Complemento);
         Assert.Equal($"SenhaValida123{DatabaseType}", obtido.Senha.Valor);
     }
 
@@ -84,7 +84,7 @@ public class ColaboradorInfrastructureTests : TestBase
     public async Task Colaborador_Atualizar_Sucesso()
     {
         var colaborador = await CriarEInserirColaboradorAsync(_colaboradorRepo, _logradouroRepo, DatabaseType);
-        var novoNome = "Colaborador Alisson Editado " + Guid.NewGuid().ToString("N")[..5];
+        var novoNome = "Colaborador Felipe Editado " + Guid.NewGuid().ToString("N")[..5];
         var logradouro = await _logradouroRepo.ObterPorId(colaborador.Endereco.LogradouroId);
 
         var atualizado = Colaborador.Criar(
@@ -96,7 +96,7 @@ public class ColaboradorInfrastructureTests : TestBase
             colaborador.Email.Valor,
             logradouro!,
             "300",
-            "Assis",
+            "Brüggemann",
             $"SenhaValida123{DatabaseType}",
             colaborador.Foto,
             colaborador.DataAdmissao,
@@ -122,7 +122,7 @@ public class ColaboradorInfrastructureTests : TestBase
         var foto = Arquivo.Criar(new byte[] { 1, 2 }).Value!;
         var inexistente = Colaborador.Criar(
             999999, "Inexistente", GerarCpf(), new DateOnly(1990, 1, 1),
-            GerarTelefone(), GerarEmail(), logradouro, "1", "Assis",
+            GerarTelefone(), GerarEmail(), logradouro, "1", "Brüggemann",
             $"SenhaValida123{DatabaseType}", foto, new DateOnly(2020, 1, 1),
             ColaboradorTipo.Atendente, ColaboradorVinculo.CLT
         ).Value!;

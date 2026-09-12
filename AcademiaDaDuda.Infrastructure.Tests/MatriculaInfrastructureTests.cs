@@ -1,9 +1,10 @@
 ﻿// Felipe Antonio Brüggemann
-
 using AcademiaDaDuda.Domain.Entities;
 using AcademiaDaDuda.Domain.Enums;
-using AcademiaDaDuda.Domain.ValueObjects;
+using AcademiaDaDuda.Infrastructure.Data;
 using AcademiaDaDuda.Infrastructure.Repositories;
+using AcademiaDaDuda.Infrastructure.Tests;
+
 using Xunit;
 
 namespace AcademiaDaDuda.Infrastructure.Tests;

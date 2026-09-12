@@ -27,14 +27,14 @@ public class AlunoInfrastructureTests : TestBase
 
         var alunoResult = Aluno.Criar(
             id: 0,
-            nome: "Aluno Alisson " + Guid.NewGuid().ToString("N")[..5],
+            nome: "Felipe Antonio Brüggemann " + Guid.NewGuid().ToString("N")[..5],
             cpf: GerarCpf(),
             dataNascimento: new DateOnly(2000, 10, 10),
             telefone: GerarTelefone(),
             email: GerarEmail(),
             endereco: logradouro,
             numero: "100",
-            complemento: "Assis",
+            complemento: "Brüggemann",
             senha: $"SenhaValida123{dbType}",
             foto: foto
         );
@@ -55,7 +55,7 @@ public class AlunoInfrastructureTests : TestBase
         Assert.NotNull(obtido);
         Assert.Equal(aluno.Id, obtido.Id);
         Assert.Equal(aluno.Nome, obtido.Nome);
-        Assert.Equal("Assis", obtido.Endereco.Complemento);
+        Assert.Equal("Brüggemann", obtido.Endereco.Complemento);
         Assert.Equal($"SenhaValida123{DatabaseType}", obtido.Senha.Valor);
     }
 
@@ -79,7 +79,7 @@ public class AlunoInfrastructureTests : TestBase
     public async Task Aluno_Atualizar_Sucesso()
     {
         var aluno = await CriarEInserirAlunoAsync(_alunoRepo, _logradouroRepo, DatabaseType);
-        var novoNome = "Aluno Alisson Editado " + Guid.NewGuid().ToString("N")[..5];
+        var novoNome = "Aluno Felipe Editado " + Guid.NewGuid().ToString("N")[..5];
         var logradouro = await _logradouroRepo.ObterPorId(aluno.Endereco.LogradouroId);
 
         var atualizado = Aluno.Criar(
@@ -91,7 +91,7 @@ public class AlunoInfrastructureTests : TestBase
             aluno.Email.Valor,
             logradouro!,
             "200",
-            "Assis",
+            "Brüggemann",
             $"SenhaValida123{DatabaseType}",
             aluno.Foto
         ).Value!;

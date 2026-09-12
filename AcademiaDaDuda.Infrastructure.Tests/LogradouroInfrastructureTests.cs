@@ -19,7 +19,7 @@ public class LogradouroInfrastructureTests : TestBase
     internal static async Task<Logradouro> CriarEInserirLogradouroAsync(LogradouroRepository logradouroRepo, string cidade = "SQLite")
     {
         var cep = GerarCep();
-        var logradouroResult = Logradouro.Criar(0, cep, "Alisson", "Assis", cidade, "SC", "Brasil");
+        var logradouroResult = Logradouro.Criar(0, cep, "Felipe", "Brüggemann", cidade, "SC", "Brasil");
         if (logradouroResult.IsFailure)
         {
             throw new Exception($"Falha ao criar Logradouro: {string.Join(", ", logradouroResult.Notifications.Select(n => n.Mensagem))}");
@@ -32,14 +32,14 @@ public class LogradouroInfrastructureTests : TestBase
     public async Task Logradouro_Adicionar_E_ObterPorId_Sucesso()
     {
         var cep = GerarCep();
-        var logradouro = Logradouro.Criar(0, cep, "Alisson", "Assis", DatabaseType.ToString(), "SC", "Brasil").Value!;
+        var logradouro = Logradouro.Criar(0, cep, "Felipe", "Brüggemann", DatabaseType.ToString(), "SC", "Brasil").Value!;
 
         var inserido = await _repository.Adicionar(logradouro);
 
         Assert.NotNull(inserido);
         Assert.True(inserido.Id > 0);
         Assert.Equal(cep, inserido.Cep.Valor);
-        Assert.Equal("Alisson", inserido.Nome);
+        Assert.Equal("Felipe", inserido.Nome);
 
         var obtido = await _repository.ObterPorId(inserido.Id);
 
@@ -149,7 +149,7 @@ public class LogradouroInfrastructureTests : TestBase
     {
         var cep = GerarCep();
         var cidadeUnica = "CidadeUnica_" + Guid.NewGuid().ToString("N")[..5];
-        var logradouro = Logradouro.Criar(0, cep, "Alisson", "Assis", cidadeUnica, "SC", "Brasil").Value!;
+        var logradouro = Logradouro.Criar(0, cep, "Felipe", "Brüggemann", cidadeUnica, "SC", "Brasil").Value!;
 
         await _repository.Adicionar(logradouro);
 
