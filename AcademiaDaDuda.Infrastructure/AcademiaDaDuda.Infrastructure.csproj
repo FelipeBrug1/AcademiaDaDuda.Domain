@@ -13,5 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AcademiaDaDuda.Domain\AcademiaDaDuda.Domain.csproj" />
   </ItemGroup>
-
+	<ItemGroup>
+		<EmbeddedResource Include="**\script_sqlite.sql" />
+	</ItemGroup>
 </Project>

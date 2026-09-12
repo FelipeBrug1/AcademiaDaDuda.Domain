@@ -1,4 +1,5 @@
 ﻿// Felipe Antonio Brüggemann    
+
 using AcademiaDaDuda.Infrastructure.Data;
 using Xunit;
 
@@ -8,7 +9,7 @@ namespace AcademiaDaDuda.Infrastructure.Tests;
 
 public abstract class TestBase
 {
-        protected const DatabaseType SelectedDatabaseType = DatabaseType.Sqlite;
+    protected const DatabaseType SelectedDatabaseType = DatabaseType.Sqlite;
 
     protected string ConnectionString { get; }
     protected DatabaseType DatabaseType { get; }
@@ -19,7 +20,6 @@ public abstract class TestBase
 
         ConnectionString = DatabaseType switch
         {
-            
             DatabaseType.Sqlite => $"Data Source={Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db_academia_da_duda.db")};Cache=Shared;",
             _ => throw new ArgumentOutOfRangeException(nameof(DatabaseType), DatabaseType, "SGBD não suportado para testes.")
         };
