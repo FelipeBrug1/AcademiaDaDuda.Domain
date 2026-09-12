@@ -8,8 +8,7 @@ namespace AcademiaDaDuda.Infrastructure.Tests;
 
 public abstract class TestBase
 {
-    // Alterne o SGBD alvo dos testes trocando a constante abaixo (Sqlite, SqlServer ou MySql)
-    protected const DatabaseType SelectedDatabaseType = DatabaseType.Sqlite;
+        protected const DatabaseType SelectedDatabaseType = DatabaseType.Sqlite;
 
     protected string ConnectionString { get; }
     protected DatabaseType DatabaseType { get; }
@@ -21,7 +20,7 @@ public abstract class TestBase
         ConnectionString = DatabaseType switch
         {
             
-            DatabaseType.Sqlite => $"Data Source={Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db_academia_do_tioalisson.db")};Cache=Shared;",
+            DatabaseType.Sqlite => $"Data Source={Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db_academia_da_duda.db")};Cache=Shared;",
             _ => throw new ArgumentOutOfRangeException(nameof(DatabaseType), DatabaseType, "SGBD não suportado para testes.")
         };
     }
