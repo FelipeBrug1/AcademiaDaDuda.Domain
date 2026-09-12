@@ -1,84 +1,81 @@
 ﻿// Felipe Antonio Brüggemann
+
 using AcademiaDaDuda.Domain.Entities;
 using AcademiaDaDuda.Domain.Enums;
 using AcademiaDaDuda.Domain.ValueObjects;
+using AcademiaDaDuda.Infrastructure.Data;
+using AcademiaDaDuda.Infrastructure.Exceptions;
 using AcademiaDaDuda.Infrastructure.Repositories;
+using AcademiaDaDuda.Infrastructure.Tests;
 using Xunit;
 
 namespace AcademiaDaDuda.Infrastructure.Tests;
 
 public class ColaboradorInfrastructureTests : TestBase
 {
-    private readonly ColaboradorRepository _repository;
-    private readonly LogradouroRepository _logradouroRepository;
+    private readonly ColaboradorRepository _colaboradorRepo;
+    private readonly LogradouroRepository _logradouroRepo;
 
     public ColaboradorInfrastructureTests()
     {
-        _repository = new ColaboradorRepository(ConnectionString, DatabaseType);
-        _logradouroRepository = new LogradouroRepository(ConnectionString, DatabaseType);
+        _colaboradorRepo = new ColaboradorRepository(ConnectionString, DatabaseType);
+        _logradouroRepo = new LogradouroRepository(ConnectionString, DatabaseType);
     }
 
-    private async Task<Colaborador> CriarEInserirColaboradorAsync(
-        ColaboradorTipo tipo = ColaboradorTipo.Instrutor,
-        ColaboradorVinculo vinculo = ColaboradorVinculo.CLT)
+    internal static async Task<Colaborador> CriarEInserirColaboradorAsync(ColaboradorRepository colaboradorRepo, LogradouroRepository logradouroRepo, DatabaseType dbType)
     {
-        var logradouro = await LogradouroInfrastructureTests.CriarEInserirLogradouroAsync(_logradouroRepository, DatabaseType.ToString());
-        var cpf = GerarCpf();
-        var email = GerarEmail();
-        var telefone = GerarTelefone();
-        var foto = Arquivo.Criar(new byte[] { 1, 2, 3 }).Value;
+        var logradouro = await LogradouroInfrastructureTests.CriarEInserirLogradouroAsync(logradouroRepo, dbType.ToString());
+        var foto = Arquivo.Criar(new byte[] { 5, 6, 7, 8 }).Value!;
 
-        var result = Colaborador.Criar(
-            0,
-            "Colaborador Teste",
-            cpf,
-            DateOnly.FromDateTime(DateTime.Today.AddYears(-25)),
-            telefone,
-            email,
-            logradouro,
-            "200",
-            "Sala 1",
-            "SenhaForte123",
-            foto,
-            DateOnly.FromDateTime(DateTime.Today.AddMonths(-6)),
-            tipo,
-            vinculo
+        var colaboradorResult = Colaborador.Criar(
+            id: 0,
+            nome: "Colaborador Alisson " + Guid.NewGuid().ToString("N")[..5],
+            cpf: GerarCpf(),
+            dataNascimento: new DateOnly(1995, 5, 15),
+            telefone: GerarTelefone(),
+            email: GerarEmail(),
+            endereco: logradouro,
+            numero: "200",
+            complemento: "Assis",
+            senha: $"SenhaValida123{dbType}",
+            foto: foto,
+            dataAdmissao: new DateOnly(2023, 1, 1),
+            tipo: ColaboradorTipo.Instrutor,
+            vinculo: ColaboradorVinculo.CLT
         );
 
-        if (result.IsFailure)
-            throw new Exception($"Falha ao criar Colaborador: {string.Join(", ", result.Notifications.Select(n => n.Mensagem))}");
+        if (colaboradorResult.IsFailure)
+            throw new Exception($"Falha ao criar Colaborador: {string.Join(", ", colaboradorResult.Notifications.Select(n => n.Mensagem))}");
 
-        return await _repository.Adicionar(result.Value!);
+        return await colaboradorRepo.Adicionar(colaboradorResult.Value!);
     }
 
     [Fact(DisplayName = "Colaborador: Adicionar e ObterPorId com Sucesso")]
     public async Task Colaborador_Adicionar_E_ObterPorId_Sucesso()
     {
-        var colaborador = await CriarEInserirColaboradorAsync();
+        var colaborador = await CriarEInserirColaboradorAsync(_colaboradorRepo, _logradouroRepo, DatabaseType);
 
-        var obtido = await _repository.ObterPorId(colaborador.Id);
+        var obtido = await _colaboradorRepo.ObterPorId(colaborador.Id);
 
         Assert.NotNull(obtido);
         Assert.Equal(colaborador.Id, obtido.Id);
-        Assert.Equal(colaborador.Cpf.Valor, obtido.Cpf.Valor);
-        Assert.Equal(colaborador.Email.Valor, obtido.Email.Valor);
-        Assert.Equal(colaborador.Tipo, obtido.Tipo);
+        Assert.Equal(colaborador.Nome, obtido.Nome);
+        Assert.Equal("Assis", obtido.Endereco.Complemento);
+        Assert.Equal($"SenhaValida123{DatabaseType}", obtido.Senha.Valor);
     }
 
     [Fact(DisplayName = "Colaborador: ObterPorId retorna nulo quando inexistente")]
     public async Task Colaborador_ObterPorId_RetornaNuloQuandoInexistente()
     {
-        var obtido = await _repository.ObterPorId(999999);
+        var obtido = await _colaboradorRepo.ObterPorId(999999);
         Assert.Null(obtido);
     }
 
     [Fact(DisplayName = "Colaborador: ObterTodos com Sucesso")]
     public async Task Colaborador_ObterTodos_Sucesso()
     {
-        await CriarEInserirColaboradorAsync();
-
-        var todos = await _repository.ObterTodos();
-
+        await CriarEInserirColaboradorAsync(_colaboradorRepo, _logradouroRepo, DatabaseType);
+        var todos = await _colaboradorRepo.ObterTodos();
         Assert.NotNull(todos);
         Assert.NotEmpty(todos);
     }
@@ -86,131 +83,152 @@ public class ColaboradorInfrastructureTests : TestBase
     [Fact(DisplayName = "Colaborador: Atualizar com Sucesso")]
     public async Task Colaborador_Atualizar_Sucesso()
     {
-        var colaborador = await CriarEInserirColaboradorAsync();
-        var novoEmail = GerarEmail();
-        var novoTelefone = GerarTelefone();
-        var logradouro = await _logradouroRepository.ObterPorId(colaborador.Endereco.LogradouroId);
+        var colaborador = await CriarEInserirColaboradorAsync(_colaboradorRepo, _logradouroRepo, DatabaseType);
+        var novoNome = "Colaborador Alisson Editado " + Guid.NewGuid().ToString("N")[..5];
+        var logradouro = await _logradouroRepo.ObterPorId(colaborador.Endereco.LogradouroId);
 
         var atualizado = Colaborador.Criar(
             colaborador.Id,
-            "Nome Atualizado",
+            novoNome,
             colaborador.Cpf.Valor,
             colaborador.DataNascimento,
-            novoTelefone,
-            novoEmail,
+            colaborador.Telefone.Valor,
+            colaborador.Email.Valor,
             logradouro!,
             "300",
-            "Sala 2",
-            "NovaSenha123",
+            "Assis",
+            $"SenhaValida123{DatabaseType}",
             colaborador.Foto,
             colaborador.DataAdmissao,
-            ColaboradorTipo.Atendente,
+            ColaboradorTipo.Administrador,
             ColaboradorVinculo.CLT
         ).Value!;
 
-        var resultado = await _repository.Atualizar(atualizado);
+        var resultado = await _colaboradorRepo.Atualizar(atualizado);
 
         Assert.NotNull(resultado);
-        Assert.Equal("Nome Atualizado", resultado.Nome);
-        Assert.Equal(ColaboradorTipo.Atendente, resultado.Tipo);
+        Assert.Equal(novoNome, resultado.Nome);
+        Assert.Equal(ColaboradorTipo.Administrador, resultado.Tipo);
 
-        var noBanco = await _repository.ObterPorId(colaborador.Id);
+        var noBanco = await _colaboradorRepo.ObterPorId(colaborador.Id);
         Assert.NotNull(noBanco);
-        Assert.Equal("Nome Atualizado", noBanco.Nome);
-        Assert.Equal(ColaboradorTipo.Atendente, noBanco.Tipo);
+        Assert.Equal(novoNome, noBanco.Nome);
+    }
+
+    [Fact(DisplayName = "Colaborador: Atualizar lança exceção quando inexistente")]
+    public async Task Colaborador_Atualizar_LancaExcecaoQuandoInexistente()
+    {
+        var logradouro = await LogradouroInfrastructureTests.CriarEInserirLogradouroAsync(_logradouroRepo, DatabaseType.ToString());
+        var foto = Arquivo.Criar(new byte[] { 1, 2 }).Value!;
+        var inexistente = Colaborador.Criar(
+            999999, "Inexistente", GerarCpf(), new DateOnly(1990, 1, 1),
+            GerarTelefone(), GerarEmail(), logradouro, "1", "Assis",
+            $"SenhaValida123{DatabaseType}", foto, new DateOnly(2020, 1, 1),
+            ColaboradorTipo.Atendente, ColaboradorVinculo.CLT
+        ).Value!;
+
+        var ex = await Assert.ThrowsAsync<InfrastructureException>(() => _colaboradorRepo.Atualizar(inexistente));
+        Assert.Equal("REGISTRO_NAO_ENCONTRADO", ex.ErrorCode);
     }
 
     [Fact(DisplayName = "Colaborador: Remover com Sucesso")]
     public async Task Colaborador_Remover_Sucesso()
     {
-        var colaborador = await CriarEInserirColaboradorAsync();
-
-        var removido = await _repository.Remover(colaborador.Id);
-
+        var colaborador = await CriarEInserirColaboradorAsync(_colaboradorRepo, _logradouroRepo, DatabaseType);
+        var removido = await _colaboradorRepo.Remover(colaborador.Id);
         Assert.True(removido);
-        var noBanco = await _repository.ObterPorId(colaborador.Id);
+
+        var noBanco = await _colaboradorRepo.ObterPorId(colaborador.Id);
         Assert.Null(noBanco);
     }
 
-    [Fact(DisplayName = "Colaborador: ObterPorCpf com Sucesso")]
-    public async Task Colaborador_ObterPorCpf_Sucesso()
+    [Fact(DisplayName = "Colaborador: Remover retorna false quando inexistente")]
+    public async Task Colaborador_Remover_RetornaFalseQuandoInexistente()
     {
-        var colaborador = await CriarEInserirColaboradorAsync();
-
-        var obtido = await _repository.ObterPorCpf(colaborador.Cpf);
-
-        Assert.NotNull(obtido);
-        Assert.Equal(colaborador.Id, obtido.Id);
+        var removido = await _colaboradorRepo.Remover(999999);
+        Assert.False(removido);
     }
 
-    [Fact(DisplayName = "Colaborador: ObterPorEmail com Sucesso")]
-    public async Task Colaborador_ObterPorEmail_Sucesso()
+    [Fact(DisplayName = "Colaborador: ObterPorCpf com Sucesso e Nulo")]
+    public async Task Colaborador_ObterPorCpf_SucessoENulo()
     {
-        var colaborador = await CriarEInserirColaboradorAsync();
-
-        var obtido = await _repository.ObterPorEmail(colaborador.Email);
-
+        var colaborador = await CriarEInserirColaboradorAsync(_colaboradorRepo, _logradouroRepo, DatabaseType);
+        var obtido = await _colaboradorRepo.ObterPorCpf(colaborador.Cpf);
         Assert.NotNull(obtido);
         Assert.Equal(colaborador.Id, obtido.Id);
+
+        var cpfInexistente = Cpf.Criar(GerarCpf()).Value!;
+        var naoObtido = await _colaboradorRepo.ObterPorCpf(cpfInexistente);
+        Assert.Null(naoObtido);
+    }
+
+    [Fact(DisplayName = "Colaborador: ObterPorEmail com Sucesso e Nulo")]
+    public async Task Colaborador_ObterPorEmail_SucessoENulo()
+    {
+        var colaborador = await CriarEInserirColaboradorAsync(_colaboradorRepo, _logradouroRepo, DatabaseType);
+        var obtido = await _colaboradorRepo.ObterPorEmail(colaborador.Email);
+        Assert.NotNull(obtido);
+        Assert.Equal(colaborador.Id, obtido.Id);
+
+        var emailInexistente = Email.Criar(GerarEmail()).Value!;
+        var naoObtido = await _colaboradorRepo.ObterPorEmail(emailInexistente);
+        Assert.Null(naoObtido);
     }
 
     [Fact(DisplayName = "Colaborador: CpfJaExiste validação correta")]
-    public async Task Colaborador_CpfJaExiste_ValidaCorretamente()
+    public async Task Colaborador_CpfJaExiste_ValidacaoCorreta()
     {
-        var colaborador = await CriarEInserirColaboradorAsync();
+        var colaborador = await CriarEInserirColaboradorAsync(_colaboradorRepo, _logradouroRepo, DatabaseType);
+        Assert.True(await _colaboradorRepo.CpfJaExiste(colaborador.Cpf));
+        Assert.False(await _colaboradorRepo.CpfJaExiste(colaborador.Cpf, colaborador.Id));
 
-        var existe = await _repository.CpfJaExiste(colaborador.Cpf);
-        Assert.True(existe);
-
-        var existeMesmoId = await _repository.CpfJaExiste(colaborador.Cpf, colaborador.Id);
-        Assert.False(existeMesmoId);
+        var cpfInedito = Cpf.Criar(GerarCpf()).Value!;
+        Assert.False(await _colaboradorRepo.CpfJaExiste(cpfInedito));
     }
 
     [Fact(DisplayName = "Colaborador: EmailJaExiste validação correta")]
-    public async Task Colaborador_EmailJaExiste_ValidaCorretamente()
+    public async Task Colaborador_EmailJaExiste_ValidacaoCorreta()
     {
-        var colaborador = await CriarEInserirColaboradorAsync();
+        var colaborador = await CriarEInserirColaboradorAsync(_colaboradorRepo, _logradouroRepo, DatabaseType);
+        Assert.True(await _colaboradorRepo.EmailJaExiste(colaborador.Email));
+        Assert.False(await _colaboradorRepo.EmailJaExiste(colaborador.Email, colaborador.Id));
 
-        var existe = await _repository.EmailJaExiste(colaborador.Email);
-        Assert.True(existe);
-
-        var existeMesmoId = await _repository.EmailJaExiste(colaborador.Email, colaborador.Id);
-        Assert.False(existeMesmoId);
+        var emailInedito = Email.Criar(GerarEmail()).Value!;
+        Assert.False(await _colaboradorRepo.EmailJaExiste(emailInedito));
     }
 
-    [Fact(DisplayName = "Colaborador: ObterPorTipo com Sucesso")]
-    public async Task Colaborador_ObterPorTipo_Sucesso()
+    [Fact(DisplayName = "Colaborador: ObterPorTipo filtragem correta")]
+    public async Task Colaborador_ObterPorTipo_FiltragemCorreta()
     {
-        var colaborador = await CriarEInserirColaboradorAsync(ColaboradorTipo.Instrutor, ColaboradorVinculo.CLT);
-
-        var lista = await _repository.ObterPorTipo(ColaboradorTipo.Instrutor);
-
-        Assert.NotNull(lista);
-        Assert.Contains(lista, c => c.Id == colaborador.Id);
+        var colaborador = await CriarEInserirColaboradorAsync(_colaboradorRepo, _logradouroRepo, DatabaseType);
+        var resultados = await _colaboradorRepo.ObterPorTipo(colaborador.Tipo);
+        Assert.NotNull(resultados);
+        Assert.Contains(resultados, c => c.Id == colaborador.Id);
     }
 
-    [Fact(DisplayName = "Colaborador: ObterPorVinculo com Sucesso")]
-    public async Task Colaborador_ObterPorVinculo_Sucesso()
+    [Fact(DisplayName = "Colaborador: ObterPorVinculo filtragem correta")]
+    public async Task Colaborador_ObterPorVinculo_FiltragemCorreta()
     {
-        var colaborador = await CriarEInserirColaboradorAsync(ColaboradorTipo.Atendente, ColaboradorVinculo.Estagio);
-
-        var lista = await _repository.ObterPorVinculo(ColaboradorVinculo.Estagio);
-
-        Assert.NotNull(lista);
-        Assert.Contains(lista, c => c.Id == colaborador.Id);
+        var colaborador = await CriarEInserirColaboradorAsync(_colaboradorRepo, _logradouroRepo, DatabaseType);
+        var resultados = await _colaboradorRepo.ObterPorVinculo(colaborador.Vinculo);
+        Assert.NotNull(resultados);
+        Assert.Contains(resultados, c => c.Id == colaborador.Id);
     }
 
-    [Fact(DisplayName = "Colaborador: TrocarSenha com Sucesso")]
-    public async Task Colaborador_TrocarSenha_Sucesso()
+    [Fact(DisplayName = "Colaborador: TrocarSenha com Sucesso e Falha")]
+    public async Task Colaborador_TrocarSenha_SucessoEFalha()
     {
-        var colaborador = await CriarEInserirColaboradorAsync();
-        var novaSenha = Senha.Criar("NovaSenhaTrocada123").Value!;
+        var colaborador = await CriarEInserirColaboradorAsync(_colaboradorRepo, _logradouroRepo, DatabaseType);
+        var novaSenha = Senha.Criar($"NovaSenha{DatabaseType}123").Value!;
 
-        var alterou = await _repository.TrocarSenha(colaborador.Id, novaSenha);
+        var alterou = await _colaboradorRepo.TrocarSenha(colaborador.Id, novaSenha);
         Assert.True(alterou);
 
-        var noBanco = await _repository.ObterPorId(colaborador.Id);
-        Assert.NotNull(noBanco);
-        Assert.Equal("NovaSenhaTrocada123", noBanco.Senha.Valor);
+        var atualizado = await _colaboradorRepo.ObterPorId(colaborador.Id);
+        Assert.NotNull(atualizado);
+        Assert.Equal($"NovaSenha{DatabaseType}123", atualizado.Senha.Valor);
+
+        var alterouInexistente = await _colaboradorRepo.TrocarSenha(999999, novaSenha);
+        Assert.False(alterouInexistente);
     }
 }

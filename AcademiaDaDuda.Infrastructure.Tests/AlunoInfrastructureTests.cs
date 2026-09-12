@@ -1,77 +1,76 @@
-﻿// Felipe Antonio Brüggemann
+﻿//Felipe AntonioBruggemann
 using AcademiaDaDuda.Domain.Entities;
 using AcademiaDaDuda.Domain.ValueObjects;
+using AcademiaDaDuda.Infrastructure.Data;
 using AcademiaDaDuda.Infrastructure.Repositories;
+using AcademiaDaDuda.Infrastructure.Tests;
+
 using Xunit;
 
 namespace AcademiaDaDuda.Infrastructure.Tests;
 
 public class AlunoInfrastructureTests : TestBase
 {
-    private readonly AlunoRepository _repository;
-    private readonly LogradouroRepository _logradouroRepository;
+    private readonly AlunoRepository _alunoRepo;
+    private readonly LogradouroRepository _logradouroRepo;
 
     public AlunoInfrastructureTests()
     {
-        _repository = new AlunoRepository(ConnectionString, DatabaseType);
-        _logradouroRepository = new LogradouroRepository(ConnectionString, DatabaseType);
+        _alunoRepo = new AlunoRepository(ConnectionString, DatabaseType);
+        _logradouroRepo = new LogradouroRepository(ConnectionString, DatabaseType);
     }
 
-    private async Task<Aluno> CriarEInserirAlunoAsync()
+    internal static async Task<Aluno> CriarEInserirAlunoAsync(AlunoRepository alunoRepo, LogradouroRepository logradouroRepo, DatabaseType dbType)
     {
-        var logradouro = await LogradouroInfrastructureTests.CriarEInserirLogradouroAsync(_logradouroRepository, DatabaseType.ToString());
-        var cpf = GerarCpf();
-        var email = GerarEmail();
-        var telefone = GerarTelefone();
-        var foto = Arquivo.Criar(new byte[] { 1, 2, 3 }).Value;
+        var logradouro = await LogradouroInfrastructureTests.CriarEInserirLogradouroAsync(logradouroRepo, dbType.ToString());
+        var foto = Arquivo.Criar(new byte[] { 1, 2, 3, 4 }).Value!;
 
         var alunoResult = Aluno.Criar(
-            0,
-            "Aluno Teste",
-            cpf,
-            DateOnly.FromDateTime(DateTime.Today.AddYears(-20)),
-            telefone,
-            email,
-            logradouro,
-            "100",
-            "Apto 1",
-            "SenhaForte123",
-            foto
+            id: 0,
+            nome: "Aluno Alisson " + Guid.NewGuid().ToString("N")[..5],
+            cpf: GerarCpf(),
+            dataNascimento: new DateOnly(2000, 10, 10),
+            telefone: GerarTelefone(),
+            email: GerarEmail(),
+            endereco: logradouro,
+            numero: "100",
+            complemento: "Assis",
+            senha: $"SenhaValida123{dbType}",
+            foto: foto
         );
 
         if (alunoResult.IsFailure)
             throw new Exception($"Falha ao criar Aluno: {string.Join(", ", alunoResult.Notifications.Select(n => n.Mensagem))}");
 
-        return await _repository.Adicionar(alunoResult.Value!);
+        return await alunoRepo.Adicionar(alunoResult.Value!);
     }
 
     [Fact(DisplayName = "Aluno: Adicionar e ObterPorId com Sucesso")]
     public async Task Aluno_Adicionar_E_ObterPorId_Sucesso()
     {
-        var aluno = await CriarEInserirAlunoAsync();
+        var aluno = await CriarEInserirAlunoAsync(_alunoRepo, _logradouroRepo, DatabaseType);
 
-        var obtido = await _repository.ObterPorId(aluno.Id);
+        var obtido = await _alunoRepo.ObterPorId(aluno.Id);
 
         Assert.NotNull(obtido);
         Assert.Equal(aluno.Id, obtido.Id);
-        Assert.Equal(aluno.Cpf.Valor, obtido.Cpf.Valor);
-        Assert.Equal(aluno.Email.Valor, obtido.Email.Valor);
+        Assert.Equal(aluno.Nome, obtido.Nome);
+        Assert.Equal("Assis", obtido.Endereco.Complemento);
+        Assert.Equal($"SenhaValida123{DatabaseType}", obtido.Senha.Valor);
     }
 
     [Fact(DisplayName = "Aluno: ObterPorId retorna nulo quando inexistente")]
     public async Task Aluno_ObterPorId_RetornaNuloQuandoInexistente()
     {
-        var obtido = await _repository.ObterPorId(999999);
+        var obtido = await _alunoRepo.ObterPorId(999999);
         Assert.Null(obtido);
     }
 
     [Fact(DisplayName = "Aluno: ObterTodos com Sucesso")]
     public async Task Aluno_ObterTodos_Sucesso()
     {
-        await CriarEInserirAlunoAsync();
-
-        var todos = await _repository.ObterTodos();
-
+        await CriarEInserirAlunoAsync(_alunoRepo, _logradouroRepo, DatabaseType);
+        var todos = await _alunoRepo.ObterTodos();
         Assert.NotNull(todos);
         Assert.NotEmpty(todos);
     }
@@ -79,55 +78,50 @@ public class AlunoInfrastructureTests : TestBase
     [Fact(DisplayName = "Aluno: Atualizar com Sucesso")]
     public async Task Aluno_Atualizar_Sucesso()
     {
-        var aluno = await CriarEInserirAlunoAsync();
-        var novoEmail = GerarEmail();
-        var novoTelefone = GerarTelefone();
-        var logradouro = await _logradouroRepository.ObterPorId(aluno.Endereco.LogradouroId);
+        var aluno = await CriarEInserirAlunoAsync(_alunoRepo, _logradouroRepo, DatabaseType);
+        var novoNome = "Aluno Alisson Editado " + Guid.NewGuid().ToString("N")[..5];
+        var logradouro = await _logradouroRepo.ObterPorId(aluno.Endereco.LogradouroId);
 
-        var alunoAtualizado = Aluno.Criar(
+        var atualizado = Aluno.Criar(
             aluno.Id,
-            "Nome Atualizado",
+            novoNome,
             aluno.Cpf.Valor,
             aluno.DataNascimento,
-            novoTelefone,
-            novoEmail,
+            aluno.Telefone.Valor,
+            aluno.Email.Valor,
             logradouro!,
             "200",
-            "Casa",
-            "NovaSenha123",
+            "Assis",
+            $"SenhaValida123{DatabaseType}",
             aluno.Foto
         ).Value!;
 
-        var resultado = await _repository.Atualizar(alunoAtualizado);
+        var resultado = await _alunoRepo.Atualizar(atualizado);
 
         Assert.NotNull(resultado);
-        Assert.Equal("Nome Atualizado", resultado.Nome);
+        Assert.Equal(novoNome, resultado.Nome);
 
-        var noBanco = await _repository.ObterPorId(aluno.Id);
+        var noBanco = await _alunoRepo.ObterPorId(aluno.Id);
         Assert.NotNull(noBanco);
-        Assert.Equal("Nome Atualizado", noBanco.Nome);
-        Assert.Equal(novoEmail, noBanco.Email.Valor);
+        Assert.Equal(novoNome, noBanco.Nome);
     }
 
     [Fact(DisplayName = "Aluno: Remover com Sucesso")]
     public async Task Aluno_Remover_Sucesso()
     {
-        var aluno = await CriarEInserirAlunoAsync();
-
-        var removido = await _repository.Remover(aluno.Id);
-
+        var aluno = await CriarEInserirAlunoAsync(_alunoRepo, _logradouroRepo, DatabaseType);
+        var removido = await _alunoRepo.Remover(aluno.Id);
         Assert.True(removido);
-        var noBanco = await _repository.ObterPorId(aluno.Id);
+
+        var noBanco = await _alunoRepo.ObterPorId(aluno.Id);
         Assert.Null(noBanco);
     }
 
     [Fact(DisplayName = "Aluno: ObterPorCpf com Sucesso")]
     public async Task Aluno_ObterPorCpf_Sucesso()
     {
-        var aluno = await CriarEInserirAlunoAsync();
-
-        var obtido = await _repository.ObterPorCpf(aluno.Cpf);
-
+        var aluno = await CriarEInserirAlunoAsync(_alunoRepo, _logradouroRepo, DatabaseType);
+        var obtido = await _alunoRepo.ObterPorCpf(aluno.Cpf);
         Assert.NotNull(obtido);
         Assert.Equal(aluno.Id, obtido.Id);
     }
@@ -135,10 +129,8 @@ public class AlunoInfrastructureTests : TestBase
     [Fact(DisplayName = "Aluno: ObterPorEmail com Sucesso")]
     public async Task Aluno_ObterPorEmail_Sucesso()
     {
-        var aluno = await CriarEInserirAlunoAsync();
-
-        var obtido = await _repository.ObterPorEmail(aluno.Email);
-
+        var aluno = await CriarEInserirAlunoAsync(_alunoRepo, _logradouroRepo, DatabaseType);
+        var obtido = await _alunoRepo.ObterPorEmail(aluno.Email);
         Assert.NotNull(obtido);
         Assert.Equal(aluno.Id, obtido.Id);
     }
@@ -146,34 +138,24 @@ public class AlunoInfrastructureTests : TestBase
     [Fact(DisplayName = "Aluno: CpfJaExiste validação correta")]
     public async Task Aluno_CpfJaExiste_ValidaCorretamente()
     {
-        var aluno = await CriarEInserirAlunoAsync();
-
-        var existe = await _repository.CpfJaExiste(aluno.Cpf);
-        Assert.True(existe);
-
-        var existeMesmoId = await _repository.CpfJaExiste(aluno.Cpf, aluno.Id);
-        Assert.False(existeMesmoId);
+        var aluno = await CriarEInserirAlunoAsync(_alunoRepo, _logradouroRepo, DatabaseType);
+        Assert.True(await _alunoRepo.CpfJaExiste(aluno.Cpf));
+        Assert.False(await _alunoRepo.CpfJaExiste(aluno.Cpf, aluno.Id));
     }
 
     [Fact(DisplayName = "Aluno: EmailJaExiste validação correta")]
     public async Task Aluno_EmailJaExiste_ValidaCorretamente()
     {
-        var aluno = await CriarEInserirAlunoAsync();
-
-        var existe = await _repository.EmailJaExiste(aluno.Email);
-        Assert.True(existe);
-
-        var existeMesmoId = await _repository.EmailJaExiste(aluno.Email, aluno.Id);
-        Assert.False(existeMesmoId);
+        var aluno = await CriarEInserirAlunoAsync(_alunoRepo, _logradouroRepo, DatabaseType);
+        Assert.True(await _alunoRepo.EmailJaExiste(aluno.Email));
+        Assert.False(await _alunoRepo.EmailJaExiste(aluno.Email, aluno.Id));
     }
 
     [Fact(DisplayName = "Aluno: ObterPorNome com Sucesso")]
     public async Task Aluno_ObterPorNome_Sucesso()
     {
-        var aluno = await CriarEInserirAlunoAsync();
-
-        var resultados = await _repository.ObterPorNome(aluno.Nome);
-
+        var aluno = await CriarEInserirAlunoAsync(_alunoRepo, _logradouroRepo, DatabaseType);
+        var resultados = await _alunoRepo.ObterPorNome(aluno.Nome);
         Assert.NotNull(resultados);
         Assert.NotEmpty(resultados);
     }
@@ -181,14 +163,14 @@ public class AlunoInfrastructureTests : TestBase
     [Fact(DisplayName = "Aluno: TrocarSenha com Sucesso")]
     public async Task Aluno_TrocarSenha_Sucesso()
     {
-        var aluno = await CriarEInserirAlunoAsync();
-        var novaSenha = Senha.Criar("SenhaTrocada123").Value!;
+        var aluno = await CriarEInserirAlunoAsync(_alunoRepo, _logradouroRepo, DatabaseType);
+        var novaSenha = Senha.Criar($"NovaSenha{DatabaseType}123").Value!;
 
-        var alterou = await _repository.TrocarSenha(aluno.Id, novaSenha);
+        var alterou = await _alunoRepo.TrocarSenha(aluno.Id, novaSenha);
         Assert.True(alterou);
 
-        var noBanco = await _repository.ObterPorId(aluno.Id);
+        var noBanco = await _alunoRepo.ObterPorId(aluno.Id);
         Assert.NotNull(noBanco);
-        Assert.Equal("SenhaTrocada123", noBanco.Senha.Valor);
+        Assert.Equal($"NovaSenha{DatabaseType}123", noBanco.Senha.Valor);
     }
 }
