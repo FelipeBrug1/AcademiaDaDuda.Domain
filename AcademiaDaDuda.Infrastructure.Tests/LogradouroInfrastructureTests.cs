@@ -168,7 +168,7 @@ public class LogradouroInfrastructureTests : TestBase
         var cep = GerarCep();
         var cidade = "Cidade_" + Guid.NewGuid().ToString("N")[..5];
         var bairro = "Bairro_" + Guid.NewGuid().ToString("N")[..5];
-        var logradouro = Logradouro.Criar(0, cep, "Rua Z", bairro, cidade, "SC", "Brasil").Value!;
+        var logradouro = Logradouro.Criar(0, cep, "Felipe", bairro, cidade, "SC", "Brasil").Value!;
 
         await _repository.Adicionar(logradouro);
 
