@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:AcademiaDaDuda.Presentation.AppMaui.ViewModels"
+             x:Class="AcademiaDaDuda.Presentation.AppMaui.Views.LogradouroPage"
+             x:DataType="viewmodels:LogradouroViewModel"
+             Title="{Binding Title}">
+
+    <ScrollView>
+        <StackLayout Spacing="15" Padding="20">
+            <!-- Campo de Busca por CEP -->
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                <StackLayout Grid.Column="0" Spacing="5">
+                    <Label Text="CEP" />
+                    <Entry Text="{Binding Logradouro.Cep}" Placeholder="00000-000" Keyboard="Numeric" />
+                </StackLayout>
+                <Button Grid.Column="1"
+                        Text="Buscar CEP"
+                        Command="{Binding SearchByCepCommand}"
+                        Style="{StaticResource ButtonPrimary}"
+                        HeightRequest="40"
+                        Padding="15,0"
+                        VerticalOptions="End">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="MaterialIcons" Glyph="&#xe8b6;" />
+                    </Button.ImageSource>
+                </Button>
+            </Grid>
+
+            <!-- Identificador do Logradouro -->
+            <Label Text="{Binding LogradouroId, StringFormat='Logradouro ID: {0}'}"
+                   HorizontalTextAlignment="Center"
+                   Style="{StaticResource SubHeadline}"
+                   IsVisible="{Binding IsEditing}" />
+
+            <!-- Nome / Rua -->
+            <StackLayout Spacing="5">
+                <Label Text="Nome/Rua" />
+                <Entry Text="{Binding Logradouro.Nome}" Placeholder="Nome da rua ou logradouro" />
+            </StackLayout>
+
+            <!-- Bairro -->
+            <StackLayout Spacing="5">
+                <Label Text="Bairro" />
+                <Entry Text="{Binding Logradouro.Bairro}" Placeholder="Bairro" />
+            </StackLayout>
+
+            <!-- Cidade -->
+            <StackLayout Spacing="5">
+                <Label Text="Cidade" />
+                <Entry Text="{Binding Logradouro.Cidade}" Placeholder="Cidade" />
+            </StackLayout>
+
+            <!-- Estado (UF) -->
+            <StackLayout Spacing="5">
+                <Label Text="Estado" />
+                <Entry Text="{Binding Logradouro.Estado}" Placeholder="UF (ex: SC)" MaxLength="2" />
+            </StackLayout>
+
+            <!-- País -->
+            <StackLayout Spacing="5">
+                <Label Text="País" />
+                <Entry Text="{Binding Logradouro.Pais}" Placeholder="País" />
+            </StackLayout>
+
+            <!-- Botões de Ação -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,15,0,0">
+                <Button Grid.Column="0"
+                        Text="Cancelar"
+                        Command="{Binding CancelCommand}"
+                        Style="{StaticResource ButtonSecondary}"
+                        HeightRequest="50">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="MaterialIcons" Glyph="&#xe5c9;" />
+                    </Button.ImageSource>
+                </Button>
+
+                <Button Grid.Column="1"
+                        Text="Salvar"
+                        Command="{Binding SaveLogradouroCommand}"
+                        Style="{StaticResource ButtonPrimary}"
+                        HeightRequest="50">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="MaterialIcons" Glyph="&#xe161;" />
+                    </Button.ImageSource>
+                </Button>
+            </Grid>
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

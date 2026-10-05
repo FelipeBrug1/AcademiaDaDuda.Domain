@@ -4,4 +4,6 @@
   <Project Path="AcademiaDaDuda.Domain/AcademiaDaDuda.Domain.csproj" />
   <Project Path="AcademiaDaDuda.Infrastructure.Tests/AcademiaDaDuda.Infrastructure.Tests.csproj" Id="ecfbb57a-4001-4e51-a656-4519447d1686" />
   <Project Path="AcademiaDaDuda.Infrastructure/AcademiaDaDuda.Infrastructure.csproj" Id="b7933c43-3856-4cc0-b808-8c9eeb856218" />
+  <Project Path="AcademiaDaDuda.Presentation.AppMaui/AcademiaDaDuda.Presentation.AppMaui.csproj" Id="937cd1c3-8f33-4cbf-ab3e-d8cbfe48bd03" />
+  <Project Path="WindowsFormsApp1/WindowsFormsApp1.csproj" Id="5f1137c9-c80a-44ed-9131-7672edbf3d86" />
 </Solution>
