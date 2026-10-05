@@ -26,13 +26,13 @@ public partial class LogradouroListViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private async Task AddLogradouroAsync()
+    private static async Task AddLogradouroAsync()
     {
         await Shell.Current.GoToAsync("logradouro");
     }
 
     [RelayCommand]
-    private async Task EditLogradouroAsync(LogradouroDto logradouro)
+    private static async Task EditLogradouroAsync(LogradouroDto logradouro)
     {
         if (logradouro == null) return;
         await Shell.Current.GoToAsync($"logradouro?Id={logradouro.Id}");

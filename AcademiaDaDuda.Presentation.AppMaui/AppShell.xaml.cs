@@ -1,5 +1,4 @@
-﻿// Felipe AntonioBrüggemann
-
+﻿// Felipe Antonio Brüggemann
 using AcademiaDaDuda.Presentation.AppMaui.Views;
 
 namespace AcademiaDaDuda.Presentation.AppMaui;

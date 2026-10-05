@@ -1,6 +1,6 @@
 ﻿// Felipe Antonio Brüggemann
 
-using AcademiaDaDuda.presentation.AppMaui;
+using AcademiaDaDuda.Presentation.AppMaui;
 using AcademiaDaDuda.Presentation.AppMaui.Configuration;
 using AcademiaDaDuda.Presentation.AppMaui.ViewModels;
 using AcademiaDaDuda.Presentation.AppMaui.Views;

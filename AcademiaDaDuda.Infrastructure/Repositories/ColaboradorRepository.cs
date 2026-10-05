@@ -10,13 +10,9 @@ using System.Data.Common;
 
 namespace AcademiaDaDuda.Infrastructure.Repositories;
 
-public class ColaboradorRepository : BaseRepository, IColaboradorRepository
+public class ColaboradorRepository(string connectionString, DatabaseType databaseType)
+    : BaseRepository(connectionString, databaseType), IColaboradorRepository
 {
-    public ColaboradorRepository(string connectionString, DatabaseType databaseType)
-        : base(connectionString, databaseType)
-    {
-    }
-
     private static string BaseSelectQuery =>
         @"SELECT c.id_colaborador, c.cpf, c.nome, c.nascimento, c.telefone, c.email,
                  c.logradouro_id, c.numero, c.complemento, c.senha, c.foto,
@@ -294,7 +290,7 @@ public class ColaboradorRepository : BaseRepository, IColaboradorRepository
                 numero: reader.GetStringValue("numero"),
                 complemento: reader.GetNullableString("complemento"),
                 senha: reader.GetStringValue("senha"),
-                foto: foto,
+                foto: foto!, // Correção: Uso do null-forgiving operator para suprimir o aviso do compilador
                 dataAdmissao: reader.GetDateOnlyValue("admissao"),
                 tipo: (ColaboradorTipo)reader.GetInt32Value("tipo"),
                 vinculo: (ColaboradorVinculo)reader.GetInt32Value("vinculo")
