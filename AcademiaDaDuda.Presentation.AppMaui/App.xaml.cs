@@ -1,10 +1,7 @@
 ﻿// Felipe Antonio Brüggemann 
-
-using Microsoft.Extensions.DependencyInjection;
-
 namespace AcademiaDaDuda.Presentation.AppMaui;
 
-public partial class App : IApplication
+public partial class App : Microsoft.Maui.Controls.Application
 {
     public App()
     {
