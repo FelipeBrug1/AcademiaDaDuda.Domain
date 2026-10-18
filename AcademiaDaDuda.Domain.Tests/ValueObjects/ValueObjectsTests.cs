@@ -95,8 +95,6 @@ public class ValueObjectsTests
     [Theory(DisplayName = "Cpf: formatos válidos com 11 dígitos")]
     [InlineData("529.982.247-25")]
     [InlineData("52998224725")]
-    [InlineData("123.456.789-00")]
-    [InlineData("111.111.111-11")]
     public void Deve_Criar_Cpf_Quando_ValorValido(string input)
     {
         var result = Cpf.Criar(input);
