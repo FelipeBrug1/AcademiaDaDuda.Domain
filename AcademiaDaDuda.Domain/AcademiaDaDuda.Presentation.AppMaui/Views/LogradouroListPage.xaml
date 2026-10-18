@@ -56,13 +56,9 @@
                                        Text="{Binding Cidade, StringFormat='{0}'}"
                                        FontSize="13" TextColor="#77758B" />
                                 <HorizontalStackLayout Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Spacing="6">
-                                    <Button Text="Editar"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LogradouroListViewModel}}, Path=EditLogradouroCommand}"
-                                            CommandParameter="{Binding .}" BackgroundColor="#E9E3FF"
+                                    <Button Text="Editar" Clicked="OnEditLogradouroClicked" BackgroundColor="#E9E3FF"
                                             TextColor="#5135B4" CornerRadius="10" Padding="10,6" />
-                                    <Button Text="Excluir"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LogradouroListViewModel}}, Path=DeleteLogradouroCommand}"
-                                            CommandParameter="{Binding .}" BackgroundColor="#FCE8EE"
+                                    <Button Text="Excluir" Clicked="OnDeleteLogradouroClicked" BackgroundColor="#FCE8EE"
                                             TextColor="#A62E57" CornerRadius="10" Padding="10,6" />
                                 </HorizontalStackLayout>
                             </Grid>
