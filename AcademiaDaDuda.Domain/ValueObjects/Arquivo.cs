@@ -18,6 +18,9 @@ public record Arquivo
         if (conteudo == null)
             return Result<Arquivo>.Failure("Arquivo", "ARQUIVO_OBRIGATORIO");
 
+        if (conteudo.Length == 0)
+            return Result<Arquivo>.Failure("Arquivo", "ARQUIVO_VAZIO");
+
         const int tamanhoMaximoBytes = 15 * 1024 * 1024; // 15MB
         if (conteudo.Length > tamanhoMaximoBytes)
             return Result<Arquivo>.Failure("Arquivo", "ARQUIVO_TIPO_TAMANHO");

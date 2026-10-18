@@ -44,6 +44,16 @@ public class Matricula : Entity, IAggregateRoot
         }
 
         if (!Enum.IsDefined(plano)) notifications.Add(new Notification("Plano", "PLANO_INVALIDO"));
+
+        const MatriculaRestricoes restricoesConhecidas =
+            MatriculaRestricoes.Diabetes
+            | MatriculaRestricoes.PressaoAlta
+            | MatriculaRestricoes.Labirintite
+            | MatriculaRestricoes.Alergias
+            | MatriculaRestricoes.ProblemasRespiratorios
+            | MatriculaRestricoes.RemedioContinuo;
+        if ((restricoesMedicas & ~restricoesConhecidas) != MatriculaRestricoes.None)
+            notifications.Add(new Notification("RestricoesMedicas", "RESTRICOES_INVALIDAS"));
         if (dataInicio == default) notifications.Add(new Notification("DataInicio", "DATA_INICIO_OBRIGATORIO"));
 
         DateOnly dataFim = default;

@@ -25,7 +25,8 @@ public static class DbProvider
             DbConnection connection = dbType switch
             {
                 
-                DatabaseType.Sqlite => new SqliteConnection(connectionString),
+                DatabaseType.Sqlite => new SqliteConnection(
+                    new SqliteConnectionStringBuilder(connectionString) { ForeignKeys = true }.ToString()),
 
                 _ => throw new InfrastructureException("SGDB_NAO_SUPORTADO", $"SGDB não suportado: {dbType}")
             };
@@ -122,7 +123,7 @@ public static class DbProvider
     {
         return dbType switch
         {
-            DatabaseType.Sqlite => "CURRENT_TIMESTAMP",
+            DatabaseType.Sqlite => "DATE('now', 'localtime')",
             _ => "CURRENT_TIMESTAMP"
         };
     }

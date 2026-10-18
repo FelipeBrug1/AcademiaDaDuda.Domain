@@ -24,35 +24,25 @@ public record Cpf
     }
     private static bool Validar(string cpf)
     {
-        if (cpf.Length != 11) return false;
-        /*
-        string[] invalidos = ["00000000000", "11111111111", "22222222222", "33333333333", "44444444444", "55555555555", "66666666666", "77777777777", "88888888888", "99999999999"];
-        if (invalidos.Contains(cpf)) return false;
-        var tempCpf = cpf[..9];
-        var soma = 0;
-        int[] multiplicador1 = [10, 9, 8, 7, 6, 5, 4, 3, 2];
-        for (var i = 0; i < 9; i++)
-        soma += (tempCpf[i] - '0') * multiplicador1[i];
-        var resto = soma % 11;
-        if (resto < 2)
-        resto = 0;
-        else
-        resto = 11 - resto;
-        var digito = resto.ToString();
-        tempCpf += digito;
-        soma = 0;
-        int[] multiplicador2 = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
-        for (var i = 0; i < 10; i++)
-        soma += (tempCpf[i] - '0') * multiplicador2[i];
-        resto = soma % 11;
-        if (resto < 2)
-        resto = 0;
-        else
-        resto = 11 - resto;
-        digito += resto.ToString();
-        return cpf.EndsWith(digito);
-        */
-        return true;
+        if (cpf.Length != 11 || cpf.All(digito => digito == cpf[0]))
+            return false;
+
+        var primeiroDigito = CalcularDigitoVerificador(cpf[..9]);
+        var segundoDigito = CalcularDigitoVerificador(cpf[..10]);
+
+        return cpf[9] - '0' == primeiroDigito
+            && cpf[10] - '0' == segundoDigito;
     }
+
+    private static int CalcularDigitoVerificador(string digitos)
+    {
+        var soma = 0;
+        for (var i = 0; i < digitos.Length; i++)
+            soma += (digitos[i] - '0') * (digitos.Length + 1 - i);
+
+        var resto = soma % 11;
+        return resto < 2 ? 0 : 11 - resto;
+    }
+
     public override string ToString() => Valor;
 }

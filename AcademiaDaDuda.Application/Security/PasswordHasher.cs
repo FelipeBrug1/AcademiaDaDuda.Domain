@@ -1,4 +1,4 @@
-﻿// Felipe Antonio Brüggemann 
+﻿// Felipe Antonio Brüggemann
 using Konscious.Security.Cryptography;
 using System.Security.Cryptography;
 using System.Text;
@@ -11,14 +11,18 @@ public static class PasswordHasher
     private const int HashSize = 32;
     private const int DefaultMemorySizeKb = 64 * 1024; // 64 MB
     private const int DefaultIterations = 3;
+    private const int MaximumDegreeOfParallelism = 64;
+    private const int MaximumPasswordLength = 1024;
 
     public static string Hash(string password)
     {
         if (string.IsNullOrEmpty(password))
             throw new ArgumentException("Password cannot be empty", nameof(password));
+        if (password.Length > MaximumPasswordLength)
+            throw new ArgumentException("Password is too long.", nameof(password));
 
         byte[] salt = RandomNumberGenerator.GetBytes(SaltSize);
-        int p = Math.Max(1, Environment.ProcessorCount);
+        int p = Math.Clamp(Environment.ProcessorCount, 1, MaximumDegreeOfParallelism);
 
         using var argon2 = new Argon2id(Encoding.UTF8.GetBytes(password))
         {
@@ -35,15 +39,20 @@ public static class PasswordHasher
 
     public static bool Verify(string password, string passwordHash)
     {
-        if (string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(passwordHash))
+        if (string.IsNullOrEmpty(password)
+            || password.Length > MaximumPasswordLength
+            || string.IsNullOrWhiteSpace(passwordHash)
+            || passwordHash.Length > 256)
             return false;
 
         var parts = passwordHash.Split(':');
         if (parts.Length != 6) return false;
         if (!parts[0].Equals("ARGON2ID", StringComparison.Ordinal)) return false;
-        if (!int.TryParse(parts[1], out int t)) return false;
-        if (!int.TryParse(parts[2], out int mKb)) return false;
-        if (!int.TryParse(parts[3], out int p)) return false;
+        if (!int.TryParse(parts[1], out int iterations) || iterations != DefaultIterations) return false;
+        if (!int.TryParse(parts[2], out int memorySizeKb) || memorySizeKb != DefaultMemorySizeKb) return false;
+        if (!int.TryParse(parts[3], out int degreeOfParallelism)
+            || degreeOfParallelism is < 1 or > MaximumDegreeOfParallelism)
+            return false;
 
         byte[] salt;
         byte[] expected;
@@ -53,20 +62,23 @@ public static class PasswordHasher
             salt = Convert.FromBase64String(parts[4]);
             expected = Convert.FromBase64String(parts[5]);
         }
-        catch
+        catch (FormatException)
         {
             return false;
         }
 
+        if (salt.Length != SaltSize || expected.Length != HashSize)
+            return false;
+
         using var argon2 = new Argon2id(Encoding.UTF8.GetBytes(password))
         {
             Salt = salt,
-            DegreeOfParallelism = Math.Max(1, p),
-            MemorySize = mKb,
-            Iterations = Math.Max(1, t)
+            DegreeOfParallelism = degreeOfParallelism,
+            MemorySize = memorySizeKb,
+            Iterations = iterations
         };
 
-        byte[] actual = argon2.GetBytes(expected.Length);
+        byte[] actual = argon2.GetBytes(HashSize);
         return CryptographicOperations.FixedTimeEquals(actual, expected);
     }
 }
