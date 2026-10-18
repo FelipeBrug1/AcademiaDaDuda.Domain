@@ -1,4 +1,6 @@
-﻿using AcademiaDaDuda.Application.DependencyInjection;
+﻿// Felipe Antonio Brüggemann
+
+using AcademiaDaDuda.Application.DependencyInjection;
 using AcademiaDaDuda.Application.Enums;
 using AcademiaDaDuda.Presentation.AppMaui.ViewModels;
 using AcademiaDaDuda.Presentation.AppMaui.Views;

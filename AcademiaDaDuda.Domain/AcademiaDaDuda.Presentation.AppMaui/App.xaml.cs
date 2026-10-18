@@ -1,4 +1,6 @@
-﻿namespace AcademiaDaDuda.Presentation.AppMaui;
+﻿// Felipe Antonio Brüggemann
+
+namespace AcademiaDaDuda.Presentation.AppMaui;
 
 public partial class App : Microsoft.Maui.Controls.Application
 {

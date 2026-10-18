@@ -1,3 +1,5 @@
+// Felipe Antonio Brüggemann
+
 using AcademiaDaDuda.Presentation.AppMaui.ViewModels;
 
 namespace AcademiaDaDuda.Presentation.AppMaui.Views;

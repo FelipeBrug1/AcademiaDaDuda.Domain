@@ -1,3 +1,5 @@
+// Felipe Antonio Brüggemann
+
 namespace AcademiaDaDuda.Presentation.AppMaui
 {
     public partial class MainPage : ContentPage

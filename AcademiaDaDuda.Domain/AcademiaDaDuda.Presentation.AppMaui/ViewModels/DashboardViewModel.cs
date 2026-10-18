@@ -1,3 +1,5 @@
+// Felipe Antonio Brüggemann
+
 using AcademiaDaDuda.Application.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;

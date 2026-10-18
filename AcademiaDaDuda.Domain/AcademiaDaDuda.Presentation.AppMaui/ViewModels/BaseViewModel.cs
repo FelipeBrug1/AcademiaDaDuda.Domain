@@ -1,8 +1,10 @@
+// Felipe Antonio Brüggemann
+
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace AcademiaDaDuda.Presentation.AppMaui.ViewModels;
 
-public class BaseViewModel : ObservableObject
+public partial class BaseViewModel : ObservableObject
 {
     private bool _isBusy;
     private bool _isRefreshing;

@@ -1,4 +1,6 @@
-﻿using AcademiaDaDuda.Presentation.AppMaui.Views;
+﻿// Felipe Antonio Brüggemann
+
+using AcademiaDaDuda.Presentation.AppMaui.Views;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AcademiaDaDuda.Presentation.AppMaui;

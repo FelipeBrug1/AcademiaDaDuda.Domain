@@ -1,4 +1,5 @@
 ﻿// Felipe Antonio Brüggemann
+
 using AcademiaDaDuda.Domain.Entities;
 using AcademiaDaDuda.Domain.ValueObjects;
 using AcademiaDaDuda.Infrastructure.Repositories;

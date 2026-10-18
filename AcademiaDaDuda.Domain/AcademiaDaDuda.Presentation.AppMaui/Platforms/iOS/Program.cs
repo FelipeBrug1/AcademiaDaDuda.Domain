@@ -1,4 +1,6 @@
-﻿using ObjCRuntime;
+﻿// Felipe Antonio Brüggemann
+
+using ObjCRuntime;
 using UIKit;
 
 namespace AcademiaDaDuda.Presentation.AppMaui

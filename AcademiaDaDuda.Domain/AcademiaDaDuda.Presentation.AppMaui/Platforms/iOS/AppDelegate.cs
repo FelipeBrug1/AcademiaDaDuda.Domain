@@ -1,4 +1,6 @@
-﻿using Foundation;
+﻿// Felipe Antonio Brüggemann
+
+using Foundation;
 
 namespace AcademiaDaDuda.Presentation.AppMaui
 {
