@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AcademiaDaDuda.Presentation.AppMaui.Views.LogradouroPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:AcademiaDaDuda.Presentation.AppMaui.ViewModels"
+    x:DataType="vm:LogradouroViewModel"
+    Title="{Binding Title}"
+    BackgroundColor="#F5F6FA">
+    <ScrollView>
+        <VerticalStackLayout Padding="22" Spacing="18">
+            <VerticalStackLayout Spacing="4">
+                <Label Text="{Binding Title}" FontSize="27" FontAttributes="Bold" TextColor="#25233A" />
+                <Label Text="Preencha os dados do endereço da academia." FontSize="14" TextColor="#77758B" />
+            </VerticalStackLayout>
+            <Border Padding="18" BackgroundColor="White" Stroke="#E8E5F0" StrokeShape="RoundRectangle 18">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Dados do endereço" FontSize="18" FontAttributes="Bold" TextColor="#5135B4" />
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="CEP" FontSize="13" FontAttributes="Bold" TextColor="#38354D" />
+                            <Entry Text="{Binding Logradouro.Cep}" Placeholder="00000-000" Keyboard="Numeric"
+                                   MaxLength="9" ClearButtonVisibility="WhileEditing" />
+                        </VerticalStackLayout>
+                        <Button Grid.Column="1" Text="Consultar" Command="{Binding SearchByCepCommand}"
+                                BackgroundColor="#E9E3FF" TextColor="#5135B4" VerticalOptions="End" CornerRadius="12" />
+                    </Grid>
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Logradouro / rua" FontSize="13" FontAttributes="Bold" TextColor="#38354D" />
+                        <Entry Text="{Binding Logradouro.Nome}" Placeholder="Ex.: Rua Felipe Antonio Brüggemann" MaxLength="150" />
+                    </VerticalStackLayout>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="Bairro" FontSize="13" FontAttributes="Bold" TextColor="#38354D" />
+                            <Entry Text="{Binding Logradouro.Bairro}" Placeholder="Bairro" MaxLength="100" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="5">
+                            <Label Text="Cidade" FontSize="13" FontAttributes="Bold" TextColor="#38354D" />
+                            <Entry Text="{Binding Logradouro.Cidade}" Placeholder="Cidade" MaxLength="100" />
+                        </VerticalStackLayout>
+                    </Grid>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <VerticalStackLayout WidthRequest="96" Spacing="5">
+                            <Label Text="Estado (UF)" FontSize="13" FontAttributes="Bold" TextColor="#38354D" />
+                            <Entry Text="{Binding Logradouro.Estado}" Placeholder="SP" CharacterSpacing="1"
+                                   MaxLength="2" HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="5">
+                            <Label Text="País" FontSize="13" FontAttributes="Bold" TextColor="#38354D" />
+                            <Entry Text="{Binding Logradouro.Pais}" Placeholder="Brasil" MaxLength="80" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                               Color="#6C4CE5" HorizontalOptions="Center" />
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <Button Text="Cancelar" Command="{Binding CancelCommand}" BackgroundColor="#E8E6EF"
+                        TextColor="#38354D" CornerRadius="14" HeightRequest="50" />
+                <Button Grid.Column="1" Text="{Binding SaveButtonText}" Command="{Binding SaveLogradouroCommand}"
+                        BackgroundColor="#6C4CE5" TextColor="White" FontAttributes="Bold"
+                        CornerRadius="14" HeightRequest="50" />
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
+
