@@ -1,3 +1,6 @@
 # Temporary logs captured while diagnosing Android emulator startup.
 /adb-daemon.*.log
 /emulator-*.log
+
+# Local delivery files are submitted separately from the source repository.
+/Entregas/

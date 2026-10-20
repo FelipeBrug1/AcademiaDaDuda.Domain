@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AcademiaDaDuda.Presentation.AppMaui.Views.AlunoListPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:AcademiaDaDuda.Presentation.AppMaui.ViewModels"
+    xmlns:dto="clr-namespace:AcademiaDaDuda.Application.DTOs;assembly=AcademiaDaDuda.Application"
+    xmlns:converters="clr-namespace:AcademiaDaDuda.Presentation.AppMaui.Converters"
+    x:DataType="vm:AlunoListViewModel"
+    Title="Alunos"
+    BackgroundColor="{DynamicResource PageBackgroundColor}">
+    <ContentPage.Resources>
+        <converters:FotoToImageSourceConverter x:Key="FotoToImageSourceConverter" />
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,Auto,*" RowSpacing="14">
+        <Grid.Padding>
+            <OnPlatform x:TypeArguments="Thickness">
+                <On Platform="Android">14,12</On>
+                <On Platform="iOS">14,24,14,12</On>
+                <On Platform="WinUI">28,20</On>
+                <On Platform="MacCatalyst">28,20</On>
+            </OnPlatform>
+        </Grid.Padding>
+
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <VerticalStackLayout Spacing="3" VerticalOptions="Center">
+                <Label Text="Alunos" FontSize="27" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                <Label Text="{Binding Alunos.Count, StringFormat='{0:N0} cadastros'}" FontSize="13" TextColor="{DynamicResource SecondaryTextColor}" />
+            </VerticalStackLayout>
+            <Button Grid.Column="1" Text="＋ Novo aluno" Command="{Binding AddAlunoCommand}"
+                    BackgroundColor="{DynamicResource BrandColor}" TextColor="White" FontAttributes="Bold"
+                    VerticalOptions="Center" CornerRadius="14" />
+        </Grid>
+
+        <Border Grid.Row="1" Padding="10" BackgroundColor="{DynamicResource SurfaceColor}"
+                Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 16">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                <Picker Title="Campo" WidthRequest="92" ItemsSource="{Binding FilterTypes}"
+                        SelectedItem="{Binding SelectedFilterType}" FontSize="13"
+                        TextColor="{DynamicResource PrimaryTextColor}" />
+                <Entry Grid.Column="1" Text="{Binding SearchText}" Placeholder="Buscar aluno"
+                       ReturnType="Search" ReturnCommand="{Binding SearchAlunosCommand}"
+                       ClearButtonVisibility="WhileEditing" VerticalOptions="Center" />
+                <Button Grid.Column="2" Text="⌕" Command="{Binding SearchAlunosCommand}"
+                        BackgroundColor="{DynamicResource BrandSoftColor}" TextColor="{DynamicResource BrandDarkColor}"
+                        CornerRadius="12" Padding="14,8" SemanticProperties.Hint="Buscar alunos" />
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="2">
+            <RefreshView IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}">
+                <CollectionView ItemsSource="{Binding Alunos}" SelectionMode="None" Margin="2">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" VerticalItemSpacing="8" HorizontalItemSpacing="8">
+                            <GridItemsLayout.Span>
+                                <OnIdiom x:TypeArguments="x:Int32">
+                                    <OnIdiom.Phone>1</OnIdiom.Phone>
+                                    <OnIdiom.Tablet>2</OnIdiom.Tablet>
+                                    <OnIdiom.Desktop>3</OnIdiom.Desktop>
+                                    <OnIdiom.TV>2</OnIdiom.TV>
+                                    <OnIdiom.Watch>1</OnIdiom.Watch>
+                                    <OnIdiom.Default>1</OnIdiom.Default>
+                                </OnIdiom>
+                            </GridItemsLayout.Span>
+                        </GridItemsLayout>
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout Padding="25" Spacing="10" VerticalOptions="Center">
+                            <Label Text="Nenhum aluno encontrado" FontSize="18" FontAttributes="Bold"
+                                   TextColor="{DynamicResource PrimaryTextColor}" HorizontalTextAlignment="Center" />
+                            <Label Text="Cadastre um aluno ou altere os filtros da busca."
+                                   FontSize="14" TextColor="{DynamicResource SecondaryTextColor}" HorizontalTextAlignment="Center" />
+                            <Button Text="Cadastrar primeiro aluno" Command="{Binding AddAlunoCommand}"
+                                    BackgroundColor="{DynamicResource BrandColor}" TextColor="White"
+                                    CornerRadius="12" HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="dto:AlunoDto">
+                            <Border Margin="0,0,0,8" Padding="14" BackgroundColor="{DynamicResource SurfaceColor}"
+                                    Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18">
+                                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="10">
+                                    <Image Grid.RowSpan="2" Source="{Binding Foto, Converter={StaticResource FotoToImageSourceConverter}}"
+                                           Aspect="AspectFill" BackgroundColor="{DynamicResource SurfaceMutedColor}"
+                                           SemanticProperties.Description="Foto do aluno">
+                                        <Image.WidthRequest>
+                                            <OnIdiom x:TypeArguments="x:Double">
+                                                <OnIdiom.Phone>72</OnIdiom.Phone>
+                                                <OnIdiom.Tablet>88</OnIdiom.Tablet>
+                                                <OnIdiom.Desktop>96</OnIdiom.Desktop>
+                                                <OnIdiom.Default>72</OnIdiom.Default>
+                                            </OnIdiom>
+                                        </Image.WidthRequest>
+                                        <Image.HeightRequest>
+                                            <OnIdiom x:TypeArguments="x:Double">
+                                                <OnIdiom.Phone>72</OnIdiom.Phone>
+                                                <OnIdiom.Tablet>88</OnIdiom.Tablet>
+                                                <OnIdiom.Desktop>96</OnIdiom.Desktop>
+                                                <OnIdiom.Default>72</OnIdiom.Default>
+                                            </OnIdiom>
+                                        </Image.HeightRequest>
+                                    </Image>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                        <Label Text="{Binding Nome}" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                                        <Label Text="{Binding Cpf, StringFormat='CPF: {0}'}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
+                                        <Label Text="{Binding Telefone, StringFormat='Telefone: {0}'}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
+                                        <Label Text="{Binding Email, StringFormat='E-mail: {0}'}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
+                                        <Label Text="{Binding Endereco.Cidade, StringFormat='Cidade: {0}'}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
+                                    </VerticalStackLayout>
+                                    <HorizontalStackLayout Grid.Row="1" Grid.ColumnSpan="2" Spacing="8" HorizontalOptions="End">
+                                        <Button Text="Editar" Clicked="OnEditAlunoClicked" BackgroundColor="{DynamicResource BrandSoftColor}"
+                                                TextColor="{DynamicResource BrandDarkColor}" CornerRadius="10" Padding="12,7" />
+                                        <Button Text="Excluir" Clicked="OnDeleteAlunoClicked" BackgroundColor="{DynamicResource DangerSoftColor}"
+                                                TextColor="{DynamicResource DangerColor}" CornerRadius="10" Padding="12,7" />
+                                    </HorizontalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                               Color="{DynamicResource BrandColor}" HorizontalOptions="Center" VerticalOptions="Start" Margin="0,10,0,0" />
+        </Grid>
+    </Grid>
+</ContentPage>

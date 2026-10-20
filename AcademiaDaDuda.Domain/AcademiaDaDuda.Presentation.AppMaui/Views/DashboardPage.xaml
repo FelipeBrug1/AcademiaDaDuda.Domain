@@ -51,29 +51,38 @@
                 </Border>
                 <Border Grid.Row="0" Grid.Column="1" Padding="18" BackgroundColor="{DynamicResource SurfaceColor}"
                         Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OpenAlunosCommand}" />
+                    </Border.GestureRecognizers>
                     <VerticalStackLayout Spacing="8">
                         <Label Text="Alunos" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}" />
                         <Label Text="{Binding TotalAlunos, StringFormat='{0:N0}'}" FontSize="30"
                                FontAttributes="Bold" TextColor="{DynamicResource StudentStatColor}" />
-                        <Label Text="Cadastros ativos" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
+                        <Label Text="Abrir cadastros  ›" FontSize="12" TextColor="{DynamicResource BrandColor}" />
                     </VerticalStackLayout>
                 </Border>
                 <Border Grid.Row="1" Grid.Column="0" Padding="18" BackgroundColor="{DynamicResource SurfaceColor}"
                         Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OpenColaboradoresCommand}" />
+                    </Border.GestureRecognizers>
                     <VerticalStackLayout Spacing="8">
                         <Label Text="Colaboradores" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}" />
                         <Label Text="{Binding TotalColaboradores, StringFormat='{0:N0}'}" FontSize="30"
                                FontAttributes="Bold" TextColor="{DynamicResource EmployeeStatColor}" />
-                        <Label Text="Cadastros ativos" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
+                        <Label Text="Abrir cadastros  ›" FontSize="12" TextColor="{DynamicResource BrandColor}" />
                     </VerticalStackLayout>
                 </Border>
                 <Border Grid.Row="1" Grid.Column="1" Padding="18" BackgroundColor="{DynamicResource SurfaceColor}"
                         Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OpenMatriculasCommand}" />
+                    </Border.GestureRecognizers>
                     <VerticalStackLayout Spacing="8">
                         <Label Text="Matrículas" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}" />
                         <Label Text="{Binding TotalMatriculas, StringFormat='{0:N0}'}" FontSize="30"
                                FontAttributes="Bold" TextColor="{DynamicResource EnrollmentStatColor}" />
-                        <Label Text="Cadastros ativos" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
+                        <Label Text="Abrir cadastros  ›" FontSize="12" TextColor="{DynamicResource BrandColor}" />
                     </VerticalStackLayout>
                 </Border>
             </Grid>

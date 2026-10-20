@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AcademiaDaDuda.Presentation.AppMaui.Views.AlunoPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:AcademiaDaDuda.Presentation.AppMaui.ViewModels"
+    xmlns:converters="clr-namespace:AcademiaDaDuda.Presentation.AppMaui.Converters"
+    x:DataType="vm:AlunoViewModel"
+    Title="{Binding Title}"
+    BackgroundColor="{DynamicResource PageBackgroundColor}">
+    <ContentPage.Resources>
+        <converters:FotoToImageSourceConverter x:Key="FotoToImageSourceConverter" />
+        <converters:DateOnlyToDateTimeConverter x:Key="DateOnlyConverter" />
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <ScrollView.Padding>
+            <OnPlatform x:TypeArguments="Thickness">
+                <On Platform="Android">14,12,14,24</On>
+                <On Platform="iOS">14,28,14,20</On>
+                <On Platform="WinUI">32,24</On>
+                <On Platform="MacCatalyst">32,24</On>
+            </OnPlatform>
+        </ScrollView.Padding>
+        <VerticalStackLayout Spacing="16">
+            <VerticalStackLayout Spacing="4">
+                <Label Text="{Binding Title}" FontSize="27" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                <Label Text="Dados pessoais, foto e endereço do aluno." FontSize="14" TextColor="{DynamicResource SecondaryTextColor}" />
+            </VerticalStackLayout>
+
+            <Border Padding="16" BackgroundColor="{DynamicResource SurfaceColor}"
+                    Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="CPF" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Entry Text="{Binding Aluno.Cpf}" Placeholder="000.000.000-00" Keyboard="Numeric"
+                               MaxLength="14" IsReadOnly="{Binding IsEditMode}" ClearButtonVisibility="WhileEditing"
+                               ReturnType="Search" ReturnCommand="{Binding SearchByCpfCommand}" />
+                        <Button Grid.Column="1" Text="Buscar" Command="{Binding SearchByCpfCommand}"
+                                BackgroundColor="{DynamicResource BrandSoftColor}" TextColor="{DynamicResource BrandDarkColor}"
+                                CornerRadius="12" Padding="14,8" />
+                    </Grid>
+                    <Label Text="Ao localizar um CPF cadastrado, os dados serão carregados para edição."
+                           FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Padding="18" BackgroundColor="{DynamicResource SurfaceColor}"
+                    Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18">
+                <VerticalStackLayout Spacing="14">
+                    <Label Text="Dados pessoais" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource BrandDarkColor}" />
+                    <Label Text="{Binding Aluno.Id, StringFormat='Aluno ID: {0}'}" IsVisible="{Binding IsEditMode}"
+                           FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Nome completo" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                        <Entry Text="{Binding Aluno.Nome}" Placeholder="Digite o nome completo" MaxLength="150"
+                               ClearButtonVisibility="WhileEditing" />
+                    </VerticalStackLayout>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="Data de nascimento" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                            <DatePicker Date="{Binding Aluno.DataNascimento, Converter={StaticResource DateOnlyConverter}, Mode=TwoWay}"
+                                        Format="dd/MM/yyyy" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="5">
+                            <Label Text="Telefone" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                            <Entry Text="{Binding Aluno.Telefone}" Placeholder="(00) 00000-0000" Keyboard="Telephone"
+                                   MaxLength="15" ClearButtonVisibility="WhileEditing" />
+                        </VerticalStackLayout>
+                    </Grid>
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="E-mail" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                        <Entry Text="{Binding Aluno.Email}" Placeholder="exemplo@email.com" Keyboard="Email"
+                               MaxLength="100" ClearButtonVisibility="WhileEditing" />
+                    </VerticalStackLayout>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="Senha" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                            <Entry Text="{Binding Aluno.Senha}" Placeholder="Mínimo 6 caracteres e uma maiúscula"
+                                   IsPassword="True" MaxLength="50" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="5">
+                            <Label Text="Confirmar senha" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                            <Entry Text="{Binding ConfirmarSenha}" Placeholder="Repita a senha" IsPassword="True" MaxLength="50" />
+                        </VerticalStackLayout>
+                    </Grid>
+                    <Label Text="Na edição, deixe os dois campos de senha vazios para manter a senha atual."
+                           IsVisible="{Binding IsEditMode}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Padding="18" BackgroundColor="{DynamicResource SurfaceColor}"
+                    Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18">
+                <VerticalStackLayout Spacing="12" HorizontalOptions="Center">
+                    <Label Text="Foto do aluno" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource BrandDarkColor}"
+                           HorizontalTextAlignment="Center" />
+                    <Border Padding="4" BackgroundColor="{DynamicResource SurfaceMutedColor}"
+                            Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18" HorizontalOptions="Center">
+                        <Image Source="{Binding Aluno.Foto, Converter={StaticResource FotoToImageSourceConverter}}"
+                               WidthRequest="160" HeightRequest="160" Aspect="AspectFill"
+                               SemanticProperties.Description="Foto do aluno" />
+                    </Border>
+                    <Label Text="A foto fica armazenada junto ao cadastro." FontSize="12"
+                           TextColor="{DynamicResource SecondaryTextColor}" HorizontalTextAlignment="Center" />
+                    <Button Text="Selecionar na galeria ou tirar foto" Command="{Binding SelectPhotoCommand}"
+                            BackgroundColor="{DynamicResource BrandSoftColor}" TextColor="{DynamicResource BrandDarkColor}"
+                            FontAttributes="Bold" CornerRadius="12" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Padding="18" BackgroundColor="{DynamicResource SurfaceColor}"
+                    Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18">
+                <VerticalStackLayout Spacing="13">
+                    <Label Text="Endereço" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource BrandDarkColor}" />
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Entry Text="{Binding Aluno.Endereco.Cep}" Placeholder="00000-000" Keyboard="Numeric"
+                               MaxLength="9" ClearButtonVisibility="WhileEditing" ReturnType="Search"
+                               ReturnCommand="{Binding SearchByCepCommand}" />
+                        <Button Grid.Column="1" Text="Buscar CEP" Command="{Binding SearchByCepCommand}"
+                                BackgroundColor="{DynamicResource BrandSoftColor}" TextColor="{DynamicResource BrandDarkColor}"
+                                CornerRadius="12" Padding="14,8" />
+                    </Grid>
+                    <Border Padding="12" BackgroundColor="{DynamicResource SurfaceMutedColor}"
+                            StrokeThickness="0" StrokeShape="RoundRectangle 12" IsVisible="{Binding HasNoEnderecoVinculado}">
+                        <Label Text="Informe um CEP já cadastrado em Logradouros e toque em Buscar CEP."
+                               FontSize="13" TextColor="{DynamicResource SecondaryTextColor}" />
+                    </Border>
+                    <Border Padding="12" BackgroundColor="{DynamicResource BrandSoftColor}"
+                            StrokeThickness="0" StrokeShape="RoundRectangle 12" IsVisible="{Binding HasEnderecoVinculado}">
+                        <VerticalStackLayout Spacing="3">
+                            <Label Text="Logradouro vinculado" FontAttributes="Bold" TextColor="{DynamicResource BrandDarkColor}" />
+                            <Label Text="{Binding Aluno.Endereco.Nome, StringFormat='Rua: {0}'}" />
+                            <Label Text="{Binding Aluno.Endereco.Bairro, StringFormat='Bairro: {0}'}" />
+                            <Label Text="{Binding Aluno.Endereco.Cidade, StringFormat='Cidade: {0}'}" />
+                            <Label Text="{Binding Aluno.Endereco.Estado, StringFormat='Estado: {0}'}" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="Número" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                            <Entry Text="{Binding Aluno.Numero}" Placeholder="Número" MaxLength="20" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="5">
+                            <Label Text="Complemento" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                            <Entry Text="{Binding Aluno.Complemento}" Placeholder="Opcional" MaxLength="50" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                               Color="{DynamicResource BrandColor}" HorizontalOptions="Center" />
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <Button Text="Cancelar" Command="{Binding CancelCommand}" BackgroundColor="{DynamicResource SurfaceMutedColor}"
+                        TextColor="{DynamicResource PrimaryTextColor}" CornerRadius="14" HeightRequest="50" />
+                <Button Grid.Column="1" Text="{Binding SaveButtonText}" Command="{Binding SaveAlunoCommand}"
+                        BackgroundColor="{DynamicResource BrandColor}" TextColor="White" FontAttributes="Bold"
+                        CornerRadius="14" HeightRequest="50" />
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

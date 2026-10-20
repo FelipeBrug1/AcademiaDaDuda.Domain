@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AcademiaDaDuda.Presentation.AppMaui.Views.MatriculaListPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:AcademiaDaDuda.Presentation.AppMaui.ViewModels"
+    xmlns:dto="clr-namespace:AcademiaDaDuda.Application.DTOs;assembly=AcademiaDaDuda.Application"
+    x:DataType="vm:MatriculaListViewModel"
+    Title="Matrículas"
+    BackgroundColor="{DynamicResource PageBackgroundColor}">
+    <Grid RowDefinitions="Auto,Auto,*" RowSpacing="14">
+        <Grid.Padding>
+            <OnPlatform x:TypeArguments="Thickness">
+                <On Platform="Android">14,12</On>
+                <On Platform="iOS">14,24,14,12</On>
+                <On Platform="WinUI">28,20</On>
+                <On Platform="MacCatalyst">28,20</On>
+            </OnPlatform>
+        </Grid.Padding>
+
+        <VerticalStackLayout Spacing="3">
+            <Label Text="Matrículas" FontSize="27" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+            <Label Text="{Binding Matriculas.Count, StringFormat='{0:N0} cadastros'}" FontSize="13" TextColor="{DynamicResource SecondaryTextColor}" />
+        </VerticalStackLayout>
+
+        <Border Grid.Row="1" Padding="10" BackgroundColor="{DynamicResource SurfaceColor}"
+                Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 16">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <Entry Text="{Binding SearchText}" Placeholder="Buscar por aluno, plano ou objetivo"
+                       ReturnType="Search" ReturnCommand="{Binding SearchMatriculasCommand}"
+                       ClearButtonVisibility="WhileEditing" VerticalOptions="Center" />
+                <Button Grid.Column="1" Text="⌕" Command="{Binding SearchMatriculasCommand}"
+                        BackgroundColor="{DynamicResource BrandSoftColor}" TextColor="{DynamicResource BrandDarkColor}"
+                        CornerRadius="12" Padding="14,8" SemanticProperties.Hint="Buscar matrículas" />
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="2">
+            <RefreshView IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}">
+                <CollectionView ItemsSource="{Binding Matriculas}" SelectionMode="None" Margin="2">
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout Padding="25" Spacing="10" VerticalOptions="Center">
+                            <Label Text="Nenhuma matrícula encontrada" FontSize="18" FontAttributes="Bold"
+                                   TextColor="{DynamicResource PrimaryTextColor}" HorizontalTextAlignment="Center" />
+                            <Label Text="As matrículas cadastradas aparecerão aqui. Você também pode buscar pelo nome do aluno, plano ou objetivo."
+                                   FontSize="14" TextColor="{DynamicResource SecondaryTextColor}" HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="dto:MatriculaDto">
+                            <Border Margin="0,0,0,8" Padding="16" BackgroundColor="{DynamicResource SurfaceColor}"
+                                    Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18">
+                                <VerticalStackLayout Spacing="6">
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                        <Label Text="{Binding AlunoMatricula.Nome}" FontSize="17" FontAttributes="Bold"
+                                               TextColor="{DynamicResource PrimaryTextColor}" VerticalOptions="Center" />
+                                        <Label Grid.Column="1" Text="{Binding Plano}" FontSize="13" FontAttributes="Bold"
+                                               TextColor="{DynamicResource BrandColor}" VerticalOptions="Center" />
+                                    </Grid>
+                                    <Label Text="{Binding Objetivo, StringFormat='Objetivo: {0}'}" FontSize="13"
+                                           TextColor="{DynamicResource SecondaryTextColor}" />
+                                    <Label Text="{Binding DataInicio, StringFormat='Início: {0:dd/MM/yyyy}'}" FontSize="12"
+                                           TextColor="{DynamicResource SecondaryTextColor}" />
+                                    <Label Text="{Binding DataFim, StringFormat='Válida até: {0:dd/MM/yyyy}'}" FontSize="12"
+                                           TextColor="{DynamicResource SecondaryTextColor}" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                               Color="{DynamicResource BrandColor}" HorizontalOptions="Center" VerticalOptions="Start" Margin="0,10,0,0" />
+        </Grid>
+    </Grid>
+</ContentPage>

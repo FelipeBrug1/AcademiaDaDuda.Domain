@@ -1,0 +1,26 @@
+ROTEIRO DE DEMONSTRAÇÃO — ACADEMIA DA DUDA
+
+Antes de gravar
+- Abra a solução a partir de um caminho sem acentos, por exemplo C:\workspace\AcademiaDaDuda.Domain.
+- Inicie o aplicativo no emulador Android ou em um aparelho conectado.
+- Use dados fictícios de teste, CPF válido ainda não cadastrado, e-mail de teste e uma foto da galeria.
+
+Colaborador
+1. Abra Colaboradores e toque em Novo colaborador.
+2. Preencha os dados obrigatórios, incluindo CPF, nascimento, telefone, e-mail, senha, data de admissão, tipo, vínculo e um CEP já cadastrado em Logradouros.
+3. Escolha uma foto pela galeria e salve o cadastro.
+4. Na lista, filtre por CPF e mostre o registro encontrado.
+5. Abra a edição, altere o nome para “Zé dos testes”, escolha outra foto da galeria e salve.
+6. Pesquise novamente pelo mesmo CPF e mostre o nome e a foto atualizados.
+7. Exclua o registro e confirme a exclusão.
+
+Aluno
+8. Abra Alunos e toque em Novo aluno.
+9. Preencha os dados obrigatórios, incluindo CPF válido ainda não cadastrado, nascimento, telefone, e-mail, senha e um CEP já cadastrado em Logradouros.
+10. Escolha uma foto pela galeria e salve o cadastro.
+11. Na lista, filtre por CPF e mostre o registro encontrado.
+12. Abra a edição, altere o nome para “Zé dos testes”, escolha outra foto da galeria e salve.
+13. Pesquise novamente pelo mesmo CPF e mostre o nome e a foto atualizados.
+14. Exclua o registro e confirme a exclusão.
+
+Finalize mostrando o dashboard e os atalhos para as listas. Grave a tela do emulador ou aparelho durante os passos; este roteiro não é um vídeo gravado.
