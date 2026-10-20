@@ -156,7 +156,7 @@ public class AcessoColaboradorRepository : BaseRepository, IAcessoColaboradorRep
     {
         try
         {
-            string query = $"{BaseSelectQuery} AND pessoa_id = @ColaboradorId ORDER BY data_hora DESC LIMIT 1";
+            string query = $"{BaseSelectQuery} AND pessoa_id = @ColaboradorId ORDER BY data_hora DESC {GetLimitOneClause()}";
             await using var command = await CreateCommandAsync(query, cancellationToken);
             command.AddParameter("@ColaboradorId", colaboradorId, DbType.Int32);
             await using var reader = await command.ExecuteReaderAsync(cancellationToken);

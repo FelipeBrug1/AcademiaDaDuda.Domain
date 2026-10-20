@@ -7,29 +7,29 @@
     xmlns:dto="clr-namespace:AcademiaDaDuda.Application.DTOs;assembly=AcademiaDaDuda.Application"
     x:DataType="vm:LogradouroListViewModel"
     Title="Logradouros"
-    BackgroundColor="#F5F6FA">
+    BackgroundColor="{DynamicResource PageBackgroundColor}">
     <Grid Padding="22" RowDefinitions="Auto,Auto,*" RowSpacing="16">
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
             <VerticalStackLayout Spacing="3">
-                <Label Text="Logradouros" FontSize="27" FontAttributes="Bold" TextColor="#25233A" />
+                <Label Text="Logradouros" FontSize="27" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
                 <Label Text="{Binding Logradouros.Count, StringFormat='{0:N0} endereços cadastrados'}"
-                       FontSize="13" TextColor="#77758B" />
+                       FontSize="13" TextColor="{DynamicResource SecondaryTextColor}" />
             </VerticalStackLayout>
-            <Button Grid.Column="1" Text="+ Novo" Command="{Binding AddLogradouroCommand}"
-                    BackgroundColor="#6C4CE5" TextColor="White" FontAttributes="Bold"
+            <Button Grid.Column="1" Text="＋ Novo" Command="{Binding AddLogradouroCommand}"
+                    BackgroundColor="{DynamicResource BrandColor}" TextColor="White" FontAttributes="Bold"
                     VerticalOptions="Center" CornerRadius="14" />
         </Grid>
 
-        <Border Grid.Row="1" Padding="10" BackgroundColor="White"
-                Stroke="#E8E5F0" StrokeShape="RoundRectangle 16">
+        <Border Grid.Row="1" Padding="10" BackgroundColor="{DynamicResource SurfaceColor}"
+                Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 16">
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
                 <Picker Title="Campo" WidthRequest="112" ItemsSource="{Binding TiposDeBusca}"
-                        SelectedItem="{Binding TipoDeBusca}" FontSize="13" TextColor="#38354D" />
+                        SelectedItem="{Binding TipoDeBusca}" FontSize="13" TextColor="{DynamicResource PrimaryTextColor}" />
                 <Entry Grid.Column="1" Text="{Binding TextoBusca}" Placeholder="Buscar"
                        ReturnType="Search" ReturnCommand="{Binding SearchLogradourosCommand}"
                        ClearButtonVisibility="WhileEditing" VerticalOptions="Center" />
-                <Button Grid.Column="2" Text="Buscar" Command="{Binding SearchLogradourosCommand}"
-                        BackgroundColor="#E9E3FF" TextColor="#5135B4" CornerRadius="12" Padding="12,8" />
+                <Button Grid.Column="2" Text="⌕  Buscar" Command="{Binding SearchLogradourosCommand}"
+                        BackgroundColor="{DynamicResource BrandSoftColor}" TextColor="{DynamicResource BrandDarkColor}" CornerRadius="12" Padding="12,8" />
             </Grid>
         </Border>
 
@@ -38,28 +38,28 @@
                 <CollectionView.EmptyView>
                     <VerticalStackLayout Padding="25" Spacing="10" VerticalOptions="Center">
                         <Label Text="Nenhum logradouro encontrado" FontSize="18" FontAttributes="Bold"
-                               TextColor="#38354D" HorizontalTextAlignment="Center" />
+                               TextColor="{DynamicResource PrimaryTextColor}" HorizontalTextAlignment="Center" />
                         <Label Text="Cadastre um endereço ou altere os filtros da busca."
-                               FontSize="14" TextColor="#77758B" HorizontalTextAlignment="Center" />
+                               FontSize="14" TextColor="{DynamicResource SecondaryTextColor}" HorizontalTextAlignment="Center" />
                     </VerticalStackLayout>
                 </CollectionView.EmptyView>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="dto:LogradouroDto">
-                        <Border Margin="0,0,0,12" Padding="16" BackgroundColor="White"
-                                Stroke="#E8E5F0" StrokeShape="RoundRectangle 16">
+                        <Border Margin="0,0,0,12" Padding="16" BackgroundColor="{DynamicResource SurfaceColor}"
+                                Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 16">
                             <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto"
                                   ColumnSpacing="12" RowSpacing="5">
-                                <Label Text="{Binding Nome}" FontSize="17" FontAttributes="Bold" TextColor="#25233A" />
+                                <Label Text="{Binding Nome}" FontSize="17" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
                                 <Label Grid.Row="1" Text="{Binding Cep, StringFormat='CEP {0}'}"
-                                       FontSize="13" TextColor="#5E43C5" />
+                                       FontSize="13" TextColor="{DynamicResource BrandColor}" />
                                 <Label Grid.Row="2" Grid.ColumnSpan="2"
                                        Text="{Binding Cidade, StringFormat='{0}'}"
-                                       FontSize="13" TextColor="#77758B" />
+                                       FontSize="13" TextColor="{DynamicResource SecondaryTextColor}" />
                                 <HorizontalStackLayout Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Spacing="6">
-                                    <Button Text="Editar" Clicked="OnEditLogradouroClicked" BackgroundColor="#E9E3FF"
-                                            TextColor="#5135B4" CornerRadius="10" Padding="10,6" />
-                                    <Button Text="Excluir" Clicked="OnDeleteLogradouroClicked" BackgroundColor="#FCE8EE"
-                                            TextColor="#A62E57" CornerRadius="10" Padding="10,6" />
+                                    <Button Text="✎  Editar" Clicked="OnEditLogradouroClicked" BackgroundColor="{DynamicResource BrandSoftColor}"
+                                            TextColor="{DynamicResource BrandDarkColor}" CornerRadius="10" Padding="10,6" />
+                                    <Button Text="×  Excluir" Clicked="OnDeleteLogradouroClicked" BackgroundColor="{DynamicResource DangerSoftColor}"
+                                            TextColor="{DynamicResource DangerColor}" CornerRadius="10" Padding="10,6" />
                                 </HorizontalStackLayout>
                             </Grid>
                         </Border>
@@ -69,7 +69,7 @@
         </RefreshView>
 
         <ActivityIndicator Grid.Row="2" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
-                           Color="#6C4CE5" HorizontalOptions="Center" VerticalOptions="Start" Margin="0,10,0,0" />
+                           Color="{DynamicResource BrandColor}" HorizontalOptions="Center" VerticalOptions="Start" Margin="0,10,0,0" />
     </Grid>
 </ContentPage>
 

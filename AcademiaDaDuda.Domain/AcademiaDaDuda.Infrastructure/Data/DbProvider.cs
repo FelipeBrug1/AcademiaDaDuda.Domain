@@ -1,6 +1,8 @@
 ﻿// Felipe Antonio Brüggemann
 using AcademiaDaDuda.Infrastructure.Exceptions;
+using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
+using MySql.Data.MySqlClient;
 using System.Data;
 using System.Data.Common;
 
@@ -8,7 +10,9 @@ namespace AcademiaDaDuda.Infrastructure.Data;
 
 public enum DatabaseType
 {
-    Sqlite
+    Sqlite,
+    MySql,
+    SqlServer
 }
 
 public static class DbProvider
@@ -24,9 +28,10 @@ public static class DbProvider
         {
             DbConnection connection = dbType switch
             {
-                
                 DatabaseType.Sqlite => new SqliteConnection(
                     new SqliteConnectionStringBuilder(connectionString) { ForeignKeys = true }.ToString()),
+                DatabaseType.MySql => new MySqlConnection(connectionString),
+                DatabaseType.SqlServer => new SqlConnection(connectionString),
 
                 _ => throw new InfrastructureException("SGDB_NAO_SUPORTADO", $"SGDB não suportado: {dbType}")
             };
@@ -102,7 +107,9 @@ public static class DbProvider
     {
         return dbType switch
         {
-                        DatabaseType.Sqlite => "script_sqlite.sql",
+            DatabaseType.Sqlite => "script_sqlite.sql",
+            DatabaseType.MySql => "script_mysql.sql",
+            DatabaseType.SqlServer => "script_sqlserver.sql",
             _ => throw new InfrastructureException("SGDB_NAO_SUPORTADO", $"SGDB não suportado: {dbType}")
         };
     }
@@ -114,7 +121,9 @@ public static class DbProvider
 
         return dbType switch
         {
-                        DatabaseType.Sqlite => $"{insertSql}; SELECT last_insert_rowid();",
+            DatabaseType.Sqlite => $"{insertSql}; SELECT last_insert_rowid();",
+            DatabaseType.MySql => $"{insertSql}; SELECT LAST_INSERT_ID();",
+            DatabaseType.SqlServer => $"{insertSql}; SELECT CAST(SCOPE_IDENTITY() AS INT);",
             _ => throw new InfrastructureException("SGDB_NAO_SUPORTADO", $"SGDB não suportado: {dbType}")
         };
     }
@@ -124,7 +133,9 @@ public static class DbProvider
         return dbType switch
         {
             DatabaseType.Sqlite => "DATE('now', 'localtime')",
-            _ => "CURRENT_TIMESTAMP"
+            DatabaseType.MySql => "CURRENT_DATE()",
+            DatabaseType.SqlServer => "CONVERT(date, GETDATE())",
+            _ => throw new InfrastructureException("SGDB_NAO_SUPORTADO", $"SGDB não suportado: {dbType}")
         };
     }
 
@@ -133,6 +144,8 @@ public static class DbProvider
         return dbType switch
         {
             DatabaseType.Sqlite => $"DATE({dateExpr}, '+' || {daysParam} || ' days')",
+            DatabaseType.MySql => $"DATE_ADD({dateExpr}, INTERVAL {daysParam} DAY)",
+            DatabaseType.SqlServer => $"DATEADD(day, {daysParam}, {dateExpr})",
             _ => throw new InfrastructureException("SGDB_NAO_SUPORTADO", $"SGDB não suportado: {dbType}")
         };
     }
@@ -141,7 +154,9 @@ public static class DbProvider
     {
         return dbType switch
         {
-           DatabaseType.Sqlite => $"CAST(strftime('%H', {dateColumn}) AS INTEGER)",
+            DatabaseType.Sqlite => $"CAST(strftime('%H', {dateColumn}) AS INTEGER)",
+            DatabaseType.MySql => $"HOUR({dateColumn})",
+            DatabaseType.SqlServer => $"DATEPART(HOUR, {dateColumn})",
             _ => throw new InfrastructureException("SGDB_NAO_SUPORTADO", $"SGDB não suportado: {dbType}")
         };
     }
@@ -150,7 +165,9 @@ public static class DbProvider
     {
         return dbType switch
         {
-           DatabaseType.Sqlite => $"CAST(strftime('%m', {dateColumn}) AS INTEGER)",
+            DatabaseType.Sqlite => $"CAST(strftime('%m', {dateColumn}) AS INTEGER)",
+            DatabaseType.MySql => $"MONTH({dateColumn})",
+            DatabaseType.SqlServer => $"DATEPART(MONTH, {dateColumn})",
             _ => throw new InfrastructureException("SGDB_NAO_SUPORTADO", $"SGDB não suportado: {dbType}")
         };
     }
@@ -160,8 +177,17 @@ public static class DbProvider
         return dbType switch
         {
             DatabaseType.Sqlite => $"CAST(strftime('%d', {dateColumn}) AS INTEGER)",
+            DatabaseType.MySql => $"DAY({dateColumn})",
+            DatabaseType.SqlServer => $"DATEPART(DAY, {dateColumn})",
             _ => throw new InfrastructureException("SGDB_NAO_SUPORTADO", $"SGDB não suportado: {dbType}")
         };
     }
+
+    public static string GetLimitOneClause(DatabaseType dbType) => dbType switch
+    {
+        DatabaseType.Sqlite or DatabaseType.MySql => "LIMIT 1",
+        DatabaseType.SqlServer => "OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY",
+        _ => throw new InfrastructureException("SGDB_NAO_SUPORTADO", $"SGDB não suportado: {dbType}")
+    };
     #endregion
 }

@@ -5,5 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     Title="Academia da Duda"
     FlyoutBehavior="Flyout"
-    FlyoutBackgroundColor="#FFFFFF"
+    Shell.ForegroundColor="{DynamicResource PrimaryTextColor}"
+    Shell.TitleColor="{DynamicResource PrimaryTextColor}"
+    FlyoutBackgroundColor="{DynamicResource SurfaceColor}"
     Shell.NavBarIsVisible="True" />

@@ -1,0 +1,3 @@
+# Temporary logs captured while diagnosing Android emulator startup.
+/adb-daemon.*.log
+/emulator-*.log

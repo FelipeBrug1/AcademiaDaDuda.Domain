@@ -1,6 +1,7 @@
 // Felipe Antonio Brüggemann
 
 using AcademiaDaDuda.Application.Interfaces;
+using AcademiaDaDuda.Presentation.AppMaui.Configuration;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -12,6 +13,7 @@ public partial class DashboardViewModel : BaseViewModel
     private readonly IAlunoService _alunoService;
     private readonly IColaboradorService _colaboradorService;
     private readonly IMatriculaService _matriculaService;
+    private readonly DatabaseSettingsStartup _databaseSettingsStartup;
 
     private int _totalLogradouros;
     private int _totalAlunos;
@@ -31,12 +33,14 @@ public partial class DashboardViewModel : BaseViewModel
         ILogradouroService logradouroService,
         IAlunoService alunoService,
         IColaboradorService colaboradorService,
-        IMatriculaService matriculaService)
+        IMatriculaService matriculaService,
+        DatabaseSettingsStartup databaseSettingsStartup)
     {
         _logradouroService = logradouroService;
         _alunoService = alunoService;
         _colaboradorService = colaboradorService;
         _matriculaService = matriculaService;
+        _databaseSettingsStartup = databaseSettingsStartup;
         Title = "Dashboard";
     }
 
@@ -49,6 +53,7 @@ public partial class DashboardViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            await _databaseSettingsStartup.EnsureInitializedAsync();
             using var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
             var logradouros = await _logradouroService.ObterTodosAsync(cancellation.Token);

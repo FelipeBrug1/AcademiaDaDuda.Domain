@@ -9,6 +9,8 @@ public static class DatabaseTypeEnumMappingExtensions
         databaseType switch
         {
             AppDatabaseType.Sqlite => DatabaseType.Sqlite,
+            AppDatabaseType.MySql => DatabaseType.MySql,
+            AppDatabaseType.SqlServer => DatabaseType.SqlServer,
             _ => throw new ArgumentOutOfRangeException(nameof(databaseType), databaseType, "Tipo de banco não suportado pela infraestrutura.")
         };
 
@@ -16,6 +18,8 @@ public static class DatabaseTypeEnumMappingExtensions
         databaseType switch
         {
             DatabaseType.Sqlite => AppDatabaseType.Sqlite,
+            DatabaseType.MySql => AppDatabaseType.MySql,
+            DatabaseType.SqlServer => AppDatabaseType.SqlServer,
             _ => throw new ArgumentOutOfRangeException(nameof(databaseType), databaseType, "Tipo de banco não suportado pela aplicação.")
         };
 }

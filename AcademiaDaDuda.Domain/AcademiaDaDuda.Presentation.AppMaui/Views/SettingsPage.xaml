@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AcademiaDaDuda.Presentation.AppMaui.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:AcademiaDaDuda.Presentation.AppMaui.ViewModels"
+    x:DataType="vm:SettingsViewModel"
+    Title="Configurações"
+    BackgroundColor="{DynamicResource PageBackgroundColor}">
+    <ScrollView>
+        <VerticalStackLayout Padding="22" Spacing="18">
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Configurações" FontSize="27" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                <Label Text="Personalize o tema e a conexão da academia." FontSize="14" TextColor="{DynamicResource SecondaryTextColor}" />
+            </VerticalStackLayout>
+
+            <Border Padding="18" BackgroundColor="{DynamicResource SurfaceColor}" Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="◐  Aparência" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource BrandColor}" />
+                    <Label Text="Tema do aplicativo" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                    <Picker Title="Selecione o tema" ItemsSource="{Binding Themes}" SelectedItem="{Binding SelectedTheme}"
+                            TextColor="{DynamicResource PrimaryTextColor}" />
+                    <Label Text="Sistema acompanha o tema do dispositivo." FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Padding="18" BackgroundColor="{DynamicResource SurfaceColor}" Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="⚙  Banco de dados" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource BrandColor}" />
+                    <Label Text="Tipo de banco" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                    <Picker Title="Selecione o banco" ItemsSource="{Binding DatabaseTypes}" SelectedItem="{Binding SelectedDatabaseType}"
+                            TextColor="{DynamicResource PrimaryTextColor}" />
+
+                    <VerticalStackLayout IsVisible="{Binding IsSqlite}" Spacing="5">
+                        <Label Text="Arquivo do banco SQLite" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                        <Entry Text="{Binding SqlitePath}" Placeholder="Caminho do arquivo .db3" ClearButtonVisibility="WhileEditing" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout IsVisible="{Binding IsServerDatabase}" Spacing="10">
+                        <Grid ColumnDefinitions="*,120" ColumnSpacing="10">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="Servidor / host" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                                <Entry Text="{Binding Server}" Placeholder="localhost ou endereço do servidor" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                <Label Text="Porta" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                                <Entry Text="{Binding Port}" Keyboard="Numeric" Placeholder="3306" />
+                            </VerticalStackLayout>
+                        </Grid>
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Banco de dados" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                            <Entry Text="{Binding Database}" Placeholder="academia_da_duda" />
+                        </VerticalStackLayout>
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="Usuário" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                                <Entry Text="{Binding Username}" Placeholder="Usuário do banco" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                <Label Text="Senha" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                                <Entry Text="{Binding Password}" IsPassword="True" Placeholder="Senha do banco" />
+                            </VerticalStackLayout>
+                        </Grid>
+                        <HorizontalStackLayout IsVisible="{Binding IsSqlServer}" Spacing="10">
+                            <CheckBox IsChecked="{Binding TrustServerCertificate}" Color="{DynamicResource BrandColor}" />
+                            <Label Text="Confiar no certificado do servidor" VerticalOptions="Center"
+                                   TextColor="{DynamicResource PrimaryTextColor}" />
+                        </HorizontalStackLayout>
+                        <Label Text="A senha fica protegida no armazenamento seguro do dispositivo." FontSize="12"
+                               TextColor="{DynamicResource SecondaryTextColor}" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                               Color="{DynamicResource BrandColor}" HorizontalOptions="Center" />
+            <Button Text="Salvar configurações" Command="{Binding SaveSettingsCommand}"
+                    BackgroundColor="{DynamicResource BrandColor}" TextColor="White" FontAttributes="Bold"
+                    CornerRadius="14" HeightRequest="52">
+                <Button.ImageSource>
+                    <FontImageSource FontFamily="MaterialIcons" Glyph="&#xe161;" />
+                </Button.ImageSource>
+            </Button>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

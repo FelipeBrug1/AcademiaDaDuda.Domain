@@ -1,4 +1,15 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg width="456" height="456" viewBox="0 0 456 456" version="1.1" xmlns="http://www.w3.org/2000/svg">
-    <rect x="0" y="0" width="456" height="456" fill="#512BD4" />
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="456" height="456" viewBox="0 0 456 456">
+  <defs>
+    <linearGradient id="neon" x1="70" y1="90" x2="380" y2="370" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#25E8F2" />
+      <stop offset="0.52" stop-color="#7864FF" />
+      <stop offset="1" stop-color="#F044D7" />
+    </linearGradient>
+  </defs>
+  <rect width="456" height="456" rx="104" fill="#090D1D" />
+  <circle cx="228" cy="228" r="171" fill="#10172D" stroke="url(#neon)" stroke-width="9" />
+  <path d="M126 321 195 135h44l91 186h-48l-18-42h-86l-15 42h-37Zm65-81h58l-31-72-27 72Z" fill="url(#neon)" />
+  <path d="M86 229h46m192 0h46M108 201v56m240-56v56" fill="none" stroke="#25E8F2" stroke-linecap="round" stroke-width="13" />
+  <circle cx="228" cy="228" r="8" fill="#F4F2FF" />
 </svg>

@@ -63,6 +63,7 @@ public abstract class BaseRepository : IDisposable, IAsyncDisposable
     protected string GetDateHourExpression(string dateColumn) => DbProvider.GetDateHourExpression(dateColumn, _databaseType);
     protected string GetDateMonthExpression(string dateColumn) => DbProvider.GetDateMonthExpression(dateColumn, _databaseType);
     protected string GetDateDayExpression(string dateColumn) => DbProvider.GetDateDayExpression(dateColumn, _databaseType);
+    protected string GetLimitOneClause() => DbProvider.GetLimitOneClause(_databaseType);
 
     public void Dispose()
     {

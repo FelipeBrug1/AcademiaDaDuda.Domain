@@ -3,7 +3,7 @@
 using AcademiaDaDuda.Infrastructure.Data;
 using Xunit;
 
-[assembly: CollectionBehavior(CollectionBehavior.CollectionPerAssembly, DisableTestParallelization = true)]
+[assembly: Xunit.v3.Parallelization(Mode = Xunit.Sdk.ParallelMode.None)]
 
 namespace AcademiaDaDuda.Infrastructure.Tests;
 

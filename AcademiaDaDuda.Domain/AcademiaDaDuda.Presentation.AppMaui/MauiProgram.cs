@@ -2,6 +2,7 @@
 
 using AcademiaDaDuda.Application.DependencyInjection;
 using AcademiaDaDuda.Application.Enums;
+using AcademiaDaDuda.Presentation.AppMaui.Configuration;
 using AcademiaDaDuda.Presentation.AppMaui.ViewModels;
 using AcademiaDaDuda.Presentation.AppMaui.Views;
 using Microsoft.Extensions.Logging;
@@ -20,6 +21,7 @@ public static class MauiProgram
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialIcons");
             });
 
         var databasePath = Path.Combine(FileSystem.AppDataDirectory, "academia-da-duda.db3");
@@ -28,13 +30,16 @@ public static class MauiProgram
             ConnectionString = $"Data Source={databasePath}",
             DatabaseType = AppDatabaseType.Sqlite
         });
+        builder.Services.AddSingleton<DatabaseSettingsStartup>();
         builder.Services.AddApplicationServices();
 
         builder.Services.AddSingleton<AppShell>();
         builder.Services.AddTransient<DashboardViewModel>();
+        builder.Services.AddTransient<SettingsViewModel>();
         builder.Services.AddTransient<LogradouroListViewModel>();
         builder.Services.AddTransient<LogradouroViewModel>();
         builder.Services.AddTransient<DashboardPage>();
+        builder.Services.AddTransient<SettingsPage>();
         builder.Services.AddTransient<LogradouroListPage>();
         builder.Services.AddTransient<LogradouroPage>();
 

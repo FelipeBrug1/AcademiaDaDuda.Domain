@@ -156,7 +156,7 @@ public class AcessoAlunoRepository : BaseRepository, IAcessoAlunoRepository
     {
         try
         {
-            string query = $"{BaseSelectQuery} AND pessoa_id = @AlunoId ORDER BY data_hora DESC LIMIT 1";
+            string query = $"{BaseSelectQuery} AND pessoa_id = @AlunoId ORDER BY data_hora DESC {GetLimitOneClause()}";
             await using var command = await CreateCommandAsync(query, cancellationToken);
             command.AddParameter("@AlunoId", alunoId, DbType.Int32);
             await using var reader = await command.ExecuteReaderAsync(cancellationToken);
@@ -201,7 +201,7 @@ public class AcessoAlunoRepository : BaseRepository, IAcessoAlunoRepository
             string query = $@"SELECT {hourExpr} AS hora, COUNT(1) AS total 
                               FROM tb_acesso 
                               WHERE pessoa_tipo = 0 AND {monthExpr} = @Mes 
-                              GROUP BY hora 
+                              GROUP BY {hourExpr}
                               ORDER BY total DESC";
 
             await using var command = await CreateCommandAsync(query, cancellationToken);

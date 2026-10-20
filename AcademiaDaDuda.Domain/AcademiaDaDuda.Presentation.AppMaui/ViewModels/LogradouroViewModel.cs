@@ -2,6 +2,7 @@
 
 using AcademiaDaDuda.Application.DTOs;
 using AcademiaDaDuda.Application.Interfaces;
+using AcademiaDaDuda.Presentation.AppMaui.Configuration;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -10,6 +11,7 @@ namespace AcademiaDaDuda.Presentation.AppMaui.ViewModels;
 public partial class LogradouroViewModel : BaseViewModel
 {
     private readonly ILogradouroService _logradouroService;
+    private readonly DatabaseSettingsStartup _databaseSettingsStartup;
     private LogradouroDto _logradouro = NewLogradouro();
     private int _logradouroId;
     private bool _isEditMode;
@@ -38,9 +40,10 @@ public partial class LogradouroViewModel : BaseViewModel
 
     public string SaveButtonText => IsEditMode ? "Salvar alterações" : "Cadastrar logradouro";
 
-    public LogradouroViewModel(ILogradouroService logradouroService)
+    public LogradouroViewModel(ILogradouroService logradouroService, DatabaseSettingsStartup databaseSettingsStartup)
     {
         _logradouroService = logradouroService;
+        _databaseSettingsStartup = databaseSettingsStartup;
         Title = "Novo logradouro";
     }
 
@@ -59,6 +62,7 @@ public partial class LogradouroViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            await _databaseSettingsStartup.EnsureInitializedAsync();
             using var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             var existing = await _logradouroService.ObterPorIdAsync(LogradouroId, cancellation.Token);
             if (existing is null)
@@ -96,6 +100,7 @@ public partial class LogradouroViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            await _databaseSettingsStartup.EnsureInitializedAsync();
             using var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             var existing = await _logradouroService.ObterPorCepAsync(cep, cancellation.Token);
             if (existing is null)
@@ -140,6 +145,7 @@ public partial class LogradouroViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            await _databaseSettingsStartup.EnsureInitializedAsync();
             Normalize(Logradouro);
             Logradouro.Id = LogradouroId;
             using var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(10));

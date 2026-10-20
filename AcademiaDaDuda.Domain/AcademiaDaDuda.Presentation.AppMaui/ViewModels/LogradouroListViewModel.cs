@@ -2,6 +2,7 @@
 
 using AcademiaDaDuda.Application.DTOs;
 using AcademiaDaDuda.Application.Interfaces;
+using AcademiaDaDuda.Presentation.AppMaui.Configuration;
 using AcademiaDaDuda.Presentation.AppMaui.Views;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
@@ -11,6 +12,7 @@ namespace AcademiaDaDuda.Presentation.AppMaui.ViewModels;
 public partial class LogradouroListViewModel : BaseViewModel
 {
     private readonly ILogradouroService _logradouroService;
+    private readonly DatabaseSettingsStartup _databaseSettingsStartup;
 
     public ObservableCollection<LogradouroDto> Logradouros { get; } = new();
     public ObservableCollection<string> TiposDeBusca { get; } = new() { "Todos", "Cidade", "ID", "CEP" };
@@ -30,9 +32,10 @@ public partial class LogradouroListViewModel : BaseViewModel
         set => SetProperty(ref _tipoDeBusca, value);
     }
 
-    public LogradouroListViewModel(ILogradouroService logradouroService)
+    public LogradouroListViewModel(ILogradouroService logradouroService, DatabaseSettingsStartup databaseSettingsStartup)
     {
         _logradouroService = logradouroService;
+        _databaseSettingsStartup = databaseSettingsStartup;
         Title = "Logradouros";
     }
 
@@ -44,6 +47,7 @@ public partial class LogradouroListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            await _databaseSettingsStartup.EnsureInitializedAsync();
             using var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             ReplaceItems(await _logradouroService.ObterTodosAsync(cancellation.Token));
         }
@@ -70,6 +74,7 @@ public partial class LogradouroListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            await _databaseSettingsStartup.EnsureInitializedAsync();
             using var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             var term = TextoBusca.Trim();
             IEnumerable<LogradouroDto> results;
@@ -168,6 +173,7 @@ public partial class LogradouroListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            await _databaseSettingsStartup.EnsureInitializedAsync();
             using var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             if (await _logradouroService.RemoverAsync(logradouro.Id, cancellation.Token))
             {
