@@ -9,7 +9,6 @@
     Title="{Binding Title}"
     BackgroundColor="{DynamicResource PageBackgroundColor}">
     <ContentPage.Resources>
-        <converters:FotoToImageSourceConverter x:Key="FotoToImageSourceConverter" />
         <converters:DateOnlyToDateTimeConverter x:Key="DateOnlyConverter" />
     </ContentPage.Resources>
 
@@ -96,7 +95,7 @@
                            HorizontalTextAlignment="Center" />
                     <Border Padding="4" BackgroundColor="{DynamicResource SurfaceMutedColor}"
                             Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18" HorizontalOptions="Center">
-                        <Image Source="{Binding Aluno.Foto, Converter={StaticResource FotoToImageSourceConverter}}"
+                        <Image Source="{Binding FotoSource}"
                                WidthRequest="160" HeightRequest="160" Aspect="AspectFill"
                                SemanticProperties.Description="Foto do aluno" />
                     </Border>

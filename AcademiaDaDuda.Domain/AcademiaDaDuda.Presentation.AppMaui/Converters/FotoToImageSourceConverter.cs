@@ -5,7 +5,10 @@ namespace AcademiaDaDuda.Presentation.AppMaui.Converters;
 
 public sealed class FotoToImageSourceConverter : IValueConverter
 {
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+        CreateImageSource(value);
+
+    public static ImageSource CreateImageSource(object? value)
     {
         var bytes = value switch
         {

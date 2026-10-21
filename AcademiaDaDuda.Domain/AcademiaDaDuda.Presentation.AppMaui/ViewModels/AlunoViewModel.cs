@@ -1,6 +1,8 @@
 using AcademiaDaDuda.Application.DTOs;
 using AcademiaDaDuda.Application.Interfaces;
 using AcademiaDaDuda.Presentation.AppMaui.Configuration;
+using AcademiaDaDuda.Presentation.AppMaui.Converters;
+using AcademiaDaDuda.Presentation.AppMaui.Services;
 using CommunityToolkit.Mvvm.Input;
 
 namespace AcademiaDaDuda.Presentation.AppMaui.ViewModels;
@@ -24,9 +26,14 @@ public partial class AlunoViewModel : BaseViewModel
         set
         {
             if (SetProperty(ref _aluno, value))
+            {
                 NotifyAddressState();
+                OnPropertyChanged(nameof(FotoSource));
+            }
         }
     }
+
+    public ImageSource FotoSource => FotoToImageSourceConverter.CreateImageSource(Aluno.Foto);
 
     public int AlunoId
     {
@@ -236,16 +243,9 @@ public partial class AlunoViewModel : BaseViewModel
                     PickerTitle = "Selecione uma foto",
                     FileTypes = FilePickerFileType.Images
                 }),
-                "Câmera" when MediaPicker.Default.IsCaptureSupported => await MediaPicker.Default.CapturePhotoAsync(),
-                "Câmera" => null,
+                "Câmera" => await PhotoCaptureService.CapturePhotoAsync(),
                 _ => null
             };
-
-            if (choice == "Câmera" && !MediaPicker.Default.IsCaptureSupported)
-            {
-                await Shell.Current.DisplayAlertAsync("Câmera indisponível", "Este dispositivo não oferece captura de fotos.", "OK");
-                return;
-            }
 
             if (photo is null)
                 return;
@@ -254,6 +254,7 @@ public partial class AlunoViewModel : BaseViewModel
             using var buffer = new MemoryStream();
             await source.CopyToAsync(buffer);
             Aluno.Foto = new ArquivoDto { Conteudo = buffer.ToArray() };
+            OnPropertyChanged(nameof(FotoSource));
             OnPropertyChanged(nameof(Aluno));
         }
         catch (Exception exception)

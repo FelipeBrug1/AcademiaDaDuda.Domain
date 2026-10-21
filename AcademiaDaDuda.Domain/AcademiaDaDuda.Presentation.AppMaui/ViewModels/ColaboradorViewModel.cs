@@ -2,6 +2,8 @@ using AcademiaDaDuda.Application.DTOs;
 using AcademiaDaDuda.Application.Enums;
 using AcademiaDaDuda.Application.Interfaces;
 using AcademiaDaDuda.Presentation.AppMaui.Configuration;
+using AcademiaDaDuda.Presentation.AppMaui.Converters;
+using AcademiaDaDuda.Presentation.AppMaui.Services;
 using CommunityToolkit.Mvvm.Input;
 using LogradouroDto = AcademiaDaDuda.Application.DTOs.LogradouroDto;
 
@@ -29,9 +31,14 @@ public partial class ColaboradorViewModel : BaseViewModel
         set
         {
             if (SetProperty(ref _colaborador, value))
+            {
                 NotifyAddressState();
+                OnPropertyChanged(nameof(FotoSource));
+            }
         }
     }
+
+    public ImageSource FotoSource => FotoToImageSourceConverter.CreateImageSource(Colaborador.Foto);
 
     public int ColaboradorId
     {
@@ -241,16 +248,9 @@ public partial class ColaboradorViewModel : BaseViewModel
                     PickerTitle = "Selecione uma foto",
                     FileTypes = FilePickerFileType.Images
                 }),
-                "Câmera" when MediaPicker.Default.IsCaptureSupported => await MediaPicker.Default.CapturePhotoAsync(),
-                "Câmera" => null,
+                "Câmera" => await PhotoCaptureService.CapturePhotoAsync(),
                 _ => null
             };
-
-            if (choice == "Câmera" && !MediaPicker.Default.IsCaptureSupported)
-            {
-                await Shell.Current.DisplayAlertAsync("Câmera indisponível", "Este dispositivo não oferece captura de fotos.", "OK");
-                return;
-            }
 
             if (photo is null)
                 return;
@@ -259,6 +259,7 @@ public partial class ColaboradorViewModel : BaseViewModel
             using var buffer = new MemoryStream();
             await source.CopyToAsync(buffer);
             Colaborador.Foto = new ArquivoDto { Conteudo = buffer.ToArray() };
+            OnPropertyChanged(nameof(FotoSource));
             OnPropertyChanged(nameof(Colaborador));
         }
         catch (Exception exception)
