@@ -18,7 +18,8 @@
                 <VerticalStackLayout Spacing="12">
                     <Label Text="◐  Aparência" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource BrandColor}" />
                     <Label Text="Tema do aplicativo" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
-                    <Picker Title="Selecione o tema" ItemsSource="{Binding Themes}" SelectedItem="{Binding SelectedTheme}"
+                    <Picker x:Name="ThemePicker" Title="Selecione o tema" ItemsSource="{Binding Themes}"
+                            SelectedItem="{Binding SelectedTheme}" SelectedIndexChanged="OnThemeSelectedIndexChanged"
                             TextColor="{DynamicResource PrimaryTextColor}" />
                     <Label Text="Sistema acompanha o tema do dispositivo." FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
                 </VerticalStackLayout>

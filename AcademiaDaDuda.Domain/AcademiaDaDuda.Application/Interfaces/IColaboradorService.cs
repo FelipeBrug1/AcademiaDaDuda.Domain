@@ -12,6 +12,7 @@ public interface IColaboradorService
     Task<ColaboradorDto> AtualizarAsync(ColaboradorDto colaboradorDto, CancellationToken cancellationToken = default);
     Task<bool> RemoverAsync(int id, CancellationToken cancellationToken = default);
     Task<ColaboradorDto?> ObterPorCpfAsync(string cpf, CancellationToken cancellationToken = default);
+    Task<IEnumerable<ColaboradorDto>> ObterPorCpfPrefixoAsync(string cpfPrefixo, CancellationToken cancellationToken = default);
     Task<ColaboradorDto?> ObterPorEmailAsync(string email, CancellationToken cancellationToken = default);
     Task<IEnumerable<ColaboradorDto>> ObterPorTipoAsync(AppColaboradorTipo tipo, CancellationToken cancellationToken = default);
     Task<IEnumerable<ColaboradorDto>> ObterPorVinculoAsync(AppColaboradorVinculo vinculo, CancellationToken cancellationToken = default);

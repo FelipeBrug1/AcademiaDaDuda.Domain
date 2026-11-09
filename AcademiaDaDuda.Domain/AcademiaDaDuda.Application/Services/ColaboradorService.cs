@@ -90,6 +90,19 @@ public class ColaboradorService : IColaboradorService
         return colaborador?.ToDto();
     }
 
+    public async Task<IEnumerable<ColaboradorDto>> ObterPorCpfPrefixoAsync(string cpfPrefixo, CancellationToken cancellationToken = default)
+    {
+        var apenasDigitos = string.IsNullOrWhiteSpace(cpfPrefixo)
+            ? string.Empty
+            : new string(cpfPrefixo.Where(char.IsDigit).ToArray());
+
+        if (apenasDigitos.Length == 0)
+            return [];
+
+        var colaboradores = await _repoFactory().ObterPorCpfPrefixo(apenasDigitos, cancellationToken);
+        return colaboradores.Select(colaborador => colaborador.ToDto()).ToList();
+    }
+
     public async Task<ColaboradorDto?> ObterPorEmailAsync(string email, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(email))

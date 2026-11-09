@@ -128,11 +128,11 @@ public class MatriculaService : IMatriculaService
         if (await _matriculaRepoFactory().PossuiMatriculaAtiva(aluno.Id, cancellationToken))
             throw new InvalidOperationException("Já existe uma matrícula ativa para este aluno.");
 
-        bool menorDe16 = aluno.DataNascimento > DateOnly.FromDateTime(DateTime.Today.AddYears(-16));
+        bool laudoPorIdade = ExigeLaudoPorIdade(aluno.DataNascimento);
         bool possuiLaudo = matriculaDto.LaudoMedico?.Conteudo != null && matriculaDto.LaudoMedico.Conteudo.Length > 0;
 
-        if (menorDe16 && !possuiLaudo)
-            throw new InvalidOperationException("Alunos menores de 16 anos devem obrigatoriamente apresentar um laudo médico que os autorize a praticar atividades físicas.");
+        if (laudoPorIdade && !possuiLaudo)
+            throw new InvalidOperationException("Alunos de 12 a 16 anos devem apresentar um laudo médico que autorize a prática de atividades físicas.");
 
         if (matriculaDto.RestricoesMedicas != AppMatriculaRestricoes.None && !possuiLaudo)
             throw new InvalidOperationException("Alunos com restrições de saúde registradas devem apresentar um parecer médico autorizando a realização de atividades físicas.");
@@ -152,16 +152,15 @@ public class MatriculaService : IMatriculaService
         var aluno = await _alunoRepoFactory().ObterPorId(matriculaExistente.AlunoId, cancellationToken)
             ?? throw new InvalidOperationException($"Aluno associado à matrícula {matriculaDto.Id} não encontrado.");
 
-        bool menorDe16 = aluno.DataNascimento > DateOnly.FromDateTime(DateTime.Today.AddYears(-16));
-        bool possuiLaudo = (matriculaDto.LaudoMedico?.Conteudo != null && matriculaDto.LaudoMedico.Conteudo.Length > 0)
-            || (matriculaDto.LaudoMedico == null && matriculaExistente.LaudoMedico != null);
+        bool laudoPorIdade = ExigeLaudoPorIdade(aluno.DataNascimento);
+        bool possuiLaudo = !matriculaDto.LaudoMedicoRemovido &&
+            ((matriculaDto.LaudoMedico?.Conteudo != null && matriculaDto.LaudoMedico.Conteudo.Length > 0)
+            || (matriculaDto.LaudoMedico == null && matriculaExistente.LaudoMedico != null));
 
-        if (menorDe16 && !possuiLaudo)
-            throw new InvalidOperationException("Alunos menores de 16 anos devem obrigatoriamente apresentar um laudo médico que os autorize a praticar atividades físicas.");
+        if (laudoPorIdade && !possuiLaudo)
+            throw new InvalidOperationException("Alunos de 12 a 16 anos devem apresentar um laudo médico que autorize a prática de atividades físicas.");
 
-        var restricoes = matriculaDto.RestricoesMedicas != default
-            ? matriculaDto.RestricoesMedicas
-            : matriculaExistente.RestricoesMedicas.ToApplication();
+        var restricoes = matriculaDto.RestricoesMedicas;
 
         if (restricoes != AppMatriculaRestricoes.None && !possuiLaudo)
             throw new InvalidOperationException("Alunos com restrições de saúde registradas devem apresentar um parecer médico autorizando a realização de atividades físicas.");
@@ -169,5 +168,11 @@ public class MatriculaService : IMatriculaService
         var matriculaAtualizada = matriculaExistente.UpdateFromDto(matriculaDto, aluno);
         var atualizada = await _matriculaRepoFactory().Atualizar(matriculaAtualizada, cancellationToken);
         return atualizada.ToDto(aluno.ToDto());
+    }
+
+    private static bool ExigeLaudoPorIdade(DateOnly nascimento)
+    {
+        var hoje = DateOnly.FromDateTime(DateTime.Today);
+        return nascimento > hoje.AddYears(-17) && nascimento <= hoje.AddYears(-12);
     }
 }

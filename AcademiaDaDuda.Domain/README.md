@@ -6,8 +6,11 @@ Aplicativo multiplataforma em .NET MAUI para gestão de academia, com identidade
 
 - Cadastro, listagem, busca, edição e exclusão de alunos.
 - Cadastro, listagem, busca, edição e exclusão de colaboradores.
-- Busca por nome, CPF, e-mail e identificador nas listas; busca por CPF também carrega um registro para edição diretamente nos formulários.
+- Cadastro, listagem, busca, edição e exclusão de matrículas, com seleção de aluno, plano, vigência calculada, restrições múltiplas e laudo médico.
+- Busca parcial por CPF com debounce, além de busca por nome, e-mail e identificador nas listas; a busca exata por CPF nos formulários carrega um registro para edição.
 - Seleção de foto pela galeria e captura pela câmera, com a foto salva junto ao cadastro.
+- Validação imediata de e-mail, opção de exibir senhas e seleção de foto ao tocar na imagem do colaborador.
+- Aplicação imediata do tema ao escolhê-lo nas configurações.
 - Associação de aluno e colaborador a um logradouro já cadastrado, com validação dos dados pessoais e profissionais.
 - Confirmação antes de excluir e mensagem amigável para registros que ainda possuem vínculos.
 - Atalhos funcionais no dashboard para Alunos, Colaboradores e Matrículas.

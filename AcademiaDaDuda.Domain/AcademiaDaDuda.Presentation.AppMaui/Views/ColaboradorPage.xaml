@@ -70,18 +70,26 @@
                     </Grid>
                     <VerticalStackLayout Spacing="5">
                         <Label Text="E-mail" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
-                        <Entry Text="{Binding Colaborador.Email}" Placeholder="exemplo@email.com" Keyboard="Email"
+                        <Entry x:Name="EmailEntry" Text="{Binding Colaborador.Email}" Placeholder="exemplo@email.com" Keyboard="Email"
+                               Unfocused="OnEmailUnfocused"
                                MaxLength="100" ClearButtonVisibility="WhileEditing" />
+                        <Label x:Name="EmailErrorLabel" FontSize="12" TextColor="#D92D20" IsVisible="False" />
                     </VerticalStackLayout>
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
                         <VerticalStackLayout Spacing="5">
-                            <Label Text="Senha" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
-                            <Entry Text="{Binding Colaborador.Senha}" Placeholder="Mínimo 6 caracteres e uma maiúscula"
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="Senha" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" VerticalOptions="Center" />
+                                <HorizontalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                                    <Switch Toggled="OnShowPasswordToggled" Scale="0.85" />
+                                    <Label Text="Mostrar" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                            </Grid>
+                            <Entry x:Name="SenhaEntry" Text="{Binding Colaborador.Senha}" Placeholder="Mínimo 6 caracteres e uma maiúscula"
                                    IsPassword="True" MaxLength="50" />
                         </VerticalStackLayout>
                         <VerticalStackLayout Grid.Column="1" Spacing="5">
                             <Label Text="Confirmar senha" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
-                            <Entry Text="{Binding ConfirmarSenha}" Placeholder="Repita a senha" IsPassword="True" MaxLength="50" />
+                            <Entry x:Name="ConfirmarSenhaEntry" Text="{Binding ConfirmarSenha}" Placeholder="Repita a senha" IsPassword="True" MaxLength="50" />
                         </VerticalStackLayout>
                     </Grid>
                     <Label Text="Na edição, deixe os dois campos de senha vazios para manter a senha atual."
@@ -128,7 +136,11 @@
                             Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18" HorizontalOptions="Center">
                         <Image Source="{Binding FotoSource}"
                                WidthRequest="160" HeightRequest="160" Aspect="AspectFill"
-                               SemanticProperties.Description="Foto do colaborador" />
+                               SemanticProperties.Description="Foto do colaborador. Toque para selecionar outra imagem.">
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectPhotoCommand}" />
+                            </Image.GestureRecognizers>
+                        </Image>
                     </Border>
                     <Label Text="A foto fica armazenada junto ao cadastro." FontSize="12"
                            TextColor="{DynamicResource SecondaryTextColor}" HorizontalTextAlignment="Center" />

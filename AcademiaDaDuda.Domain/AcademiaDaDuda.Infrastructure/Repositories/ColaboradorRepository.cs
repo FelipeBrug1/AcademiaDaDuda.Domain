@@ -165,6 +165,31 @@ public class ColaboradorRepository : BaseRepository, IColaboradorRepository
         }
     }
 
+    public async Task<IEnumerable<Colaborador>> ObterPorCpfPrefixo(string cpfPrefixo, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var apenasDigitos = new string((cpfPrefixo ?? string.Empty).Where(char.IsDigit).ToArray());
+            if (apenasDigitos.Length == 0)
+                return [];
+
+            string query = $"{BaseSelectQuery} WHERE c.cpf LIKE @Cpf ORDER BY c.nome";
+            await using var command = await CreateCommandAsync(query, cancellationToken);
+            command.AddParameter("@Cpf", $"{apenasDigitos}%", DbType.String);
+            await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+            var colaboradores = new List<Colaborador>();
+            while (await reader.ReadAsync(cancellationToken))
+                colaboradores.Add(Map(reader));
+
+            return colaboradores;
+        }
+        catch (DbException ex)
+        {
+            throw new InfrastructureException("ERRO_OBTER_POR_PREFIXO_CPF", $"Erro ao buscar colaboradores pelo prefixo de CPF {cpfPrefixo}: {ex.Message}", ex);
+        }
+    }
+
     public async Task<Colaborador?> ObterPorEmail(Email email, CancellationToken cancellationToken = default)
     {
         try

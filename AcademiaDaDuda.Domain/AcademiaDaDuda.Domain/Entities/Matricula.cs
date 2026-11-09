@@ -38,7 +38,7 @@ public class Matricula : Entity, IAggregateRoot
         {
             notifications.Add(new Notification("Aluno", "ALUNO_INVALIDO"));
         }
-        else if (aluno.DataNascimento > DateOnly.FromDateTime(DateTime.Today.AddYears(-16)) && laudoMedico == null)
+        else if (ExigeLaudoPorIdade(aluno.DataNascimento) && laudoMedico == null)
         {
             notifications.Add(new Notification("LaudoMedico", "MENOR_16_LAUDO_OBRIGATORIO"));
         }
@@ -80,5 +80,11 @@ public class Matricula : Entity, IAggregateRoot
 
         var matricula = new Matricula(id, aluno!.Id, plano, dataInicio, dataFim, objetivo, restricoesMedicas, laudoMedico, observacoesRestricoes);
         return Result<Matricula>.Success(matricula);
+    }
+
+    private static bool ExigeLaudoPorIdade(DateOnly nascimento)
+    {
+        var hoje = DateOnly.FromDateTime(DateTime.Today);
+        return nascimento > hoje.AddYears(-17) && nascimento <= hoje.AddYears(-12);
     }
 }

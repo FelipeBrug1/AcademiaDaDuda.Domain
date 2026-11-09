@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AcademiaDaDuda.Presentation.AppMaui.Views.MatriculaPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:AcademiaDaDuda.Presentation.AppMaui.ViewModels"
+    xmlns:converters="clr-namespace:AcademiaDaDuda.Presentation.AppMaui.Converters"
+    x:DataType="vm:MatriculaViewModel"
+    Title="{Binding Title}"
+    BackgroundColor="{DynamicResource PageBackgroundColor}">
+    <ContentPage.Resources>
+        <converters:FotoToImageSourceConverter x:Key="FotoToImageSourceConverter" />
+        <converters:DateOnlyToDateTimeConverter x:Key="DateOnlyConverter" />
+        <converters:EnumDisplayConverter x:Key="EnumDisplay" />
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <ScrollView.Padding>
+            <OnPlatform x:TypeArguments="Thickness">
+                <On Platform="Android">14,12,14,24</On>
+                <On Platform="iOS">14,28,14,20</On>
+                <On Platform="WinUI">32,24</On>
+                <On Platform="MacCatalyst">32,24</On>
+            </OnPlatform>
+        </ScrollView.Padding>
+        <VerticalStackLayout Spacing="16">
+            <VerticalStackLayout Spacing="4">
+                <Label Text="{Binding Title}" FontSize="27" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                <Label Text="Vincule um aluno e defina plano, período e informações de saúde." FontSize="14"
+                       TextColor="{DynamicResource SecondaryTextColor}" />
+            </VerticalStackLayout>
+
+            <Border Padding="18" BackgroundColor="{DynamicResource SurfaceColor}"
+                    Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18">
+                <VerticalStackLayout Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                        <Label Text="Aluno da matrícula" FontSize="18" FontAttributes="Bold"
+                               TextColor="{DynamicResource BrandDarkColor}" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="{Binding Matricula.Id, StringFormat='ID: {0}'}" FontSize="12"
+                               TextColor="{DynamicResource SecondaryTextColor}" IsVisible="{Binding IsEditMode}" />
+                    </Grid>
+                    <Label Text="CPF do aluno" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Entry Text="{Binding Matricula.AlunoMatricula.Cpf}" Placeholder="000.000.000-00"
+                               Keyboard="Numeric" MaxLength="14" IsReadOnly="{Binding StudentCpfIsReadOnly}"
+                               ClearButtonVisibility="WhileEditing" ReturnType="Search"
+                               ReturnCommand="{Binding SearchByCpfCommand}" />
+                        <Button Grid.Column="1" Text="Buscar" Command="{Binding SearchByCpfCommand}"
+                                BackgroundColor="{DynamicResource BrandSoftColor}" TextColor="{DynamicResource BrandDarkColor}"
+                                CornerRadius="12" Padding="14,8" />
+                    </Grid>
+
+                    <Border Padding="12" BackgroundColor="{DynamicResource SurfaceMutedColor}"
+                            StrokeThickness="0" StrokeShape="RoundRectangle 12" IsVisible="{Binding HasNoAlunoVinculado}">
+                        <Label Text="Digite o CPF de um aluno já cadastrado e toque em Buscar."
+                               FontSize="13" TextColor="{DynamicResource SecondaryTextColor}" />
+                    </Border>
+
+                    <Border Padding="12" BackgroundColor="{DynamicResource BrandSoftColor}"
+                            StrokeThickness="0" StrokeShape="RoundRectangle 12" IsVisible="{Binding HasAlunoVinculado}">
+                        <Grid ColumnDefinitions="72,*" ColumnSpacing="12" VerticalOptions="Center">
+                            <Border HeightRequest="68" WidthRequest="68" StrokeThickness="0"
+                                    BackgroundColor="{DynamicResource SurfaceColor}" StrokeShape="RoundRectangle 34">
+                                <Image Source="{Binding FotoAlunoSource}" WidthRequest="68" HeightRequest="68" Aspect="AspectFill" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
+                                <Label Text="{Binding Matricula.AlunoMatricula.Nome}" FontSize="15" FontAttributes="Bold"
+                                       TextColor="{DynamicResource PrimaryTextColor}" LineBreakMode="TailTruncation" />
+                                <Label Text="{Binding Matricula.AlunoMatricula.Cpf, StringFormat='CPF: {0}'}" FontSize="12"
+                                       TextColor="{DynamicResource SecondaryTextColor}" />
+                                <Label Text="{Binding Matricula.AlunoMatricula.DataNascimento, StringFormat='Nascimento: {0:dd/MM/yyyy}'}" FontSize="12"
+                                       TextColor="{DynamicResource SecondaryTextColor}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+
+                    <Border Padding="10" BackgroundColor="#FEF3C7" StrokeThickness="0"
+                            StrokeShape="RoundRectangle 10" IsVisible="{Binding IsAlunoEntre12E16}">
+                        <Label Text="Alunos de 12 a 16 anos precisam apresentar laudo médico para praticar atividades físicas."
+                               FontSize="12" TextColor="#92400E" />
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Padding="18" BackgroundColor="{DynamicResource SurfaceColor}"
+                    Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18">
+                <VerticalStackLayout Spacing="13">
+                    <Label Text="Plano e vigência" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource BrandDarkColor}" />
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Tipo de plano" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                        <Picker x:Name="PlanoPicker" ItemsSource="{Binding PlanoTipos}"
+                                SelectedItem="{Binding Matricula.Plano}" ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplay}}"
+                                SelectedIndexChanged="OnPlanoSelectedIndexChanged" />
+                    </VerticalStackLayout>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="Data de início" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                            <DatePicker Format="dd/MM/yyyy" Date="{Binding Matricula.DataInicio, Converter={StaticResource DateOnlyConverter}, Mode=TwoWay}"
+                                        DateSelected="OnInicioDateSelected" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="5">
+                            <Label Text="Término calculado" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                            <DatePicker x:Name="FimDatePicker" Format="dd/MM/yyyy"
+                                        Date="{Binding Matricula.DataFim, Converter={StaticResource DateOnlyConverter}, Mode=TwoWay}"
+                                        IsEnabled="False" />
+                        </VerticalStackLayout>
+                    </Grid>
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Objetivo da matrícula" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                        <Entry Text="{Binding Matricula.Objetivo}" Placeholder="Ex.: condicionamento, hipertrofia ou saúde"
+                               MaxLength="200" ClearButtonVisibility="WhileEditing" />
+                    </VerticalStackLayout>
+                    <Label Text="A data de término é calculada automaticamente conforme o plano e a data de início."
+                           FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Padding="18" BackgroundColor="{DynamicResource SurfaceColor}"
+                    Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Saúde e restrições" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource BrandDarkColor}" />
+                    <Label Text="Marque todas as condições de saúde informadas pelo aluno."
+                           FontSize="13" TextColor="{DynamicResource SecondaryTextColor}" />
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding RestricoesMulti}" Spacing="2">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:RestricaoSelectable">
+                                <Grid ColumnDefinitions="Auto,*" Padding="0,3">
+                                    <CheckBox IsChecked="{Binding IsSelected}" Color="{DynamicResource BrandColor}" VerticalOptions="Center" />
+                                    <Label Grid.Column="1" Text="{Binding Value, Converter={StaticResource EnumDisplay}}"
+                                           TextColor="{DynamicResource PrimaryTextColor}" VerticalOptions="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Observações e recomendações" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                        <Editor Text="{Binding Matricula.ObservacoesRestricoes}" Placeholder="Descreva cuidados específicos ou medicamentos contínuos"
+                                MaxLength="500" HeightRequest="90" AutoSize="TextChanges" />
+                    </VerticalStackLayout>
+                    <Border Padding="10" BackgroundColor="#FEF3C7" StrokeThickness="0"
+                            StrokeShape="RoundRectangle 10" IsVisible="{Binding HasRestricoes}">
+                        <Label Text="Condições de saúde registradas exigem um parecer médico autorizando a prática de atividades físicas."
+                               FontSize="12" TextColor="#92400E" />
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Padding="18" BackgroundColor="{DynamicResource SurfaceColor}"
+                    Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18">
+                <VerticalStackLayout Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Laudo médico" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource BrandDarkColor}" VerticalOptions="Center" />
+                        <Border Grid.Column="1" Padding="8,4" BackgroundColor="#DCFCE7" StrokeThickness="0"
+                                StrokeShape="RoundRectangle 8" IsVisible="{Binding HasLaudo}">
+                            <Label Text="Laudo anexado" FontSize="11" FontAttributes="Bold" TextColor="#166534" />
+                        </Border>
+                        <Border Grid.Column="1" Padding="8,4" BackgroundColor="#FEE2E2" StrokeThickness="0"
+                                StrokeShape="RoundRectangle 8" IsVisible="{Binding LaudoPendente}">
+                            <Label Text="Obrigatório" FontSize="11" FontAttributes="Bold" TextColor="#991B1B" />
+                        </Border>
+                        <Border Grid.Column="1" Padding="8,4" BackgroundColor="{DynamicResource SurfaceMutedColor}" StrokeThickness="0"
+                                StrokeShape="RoundRectangle 8" IsVisible="{Binding LaudoOpcional}">
+                            <Label Text="Opcional" FontSize="11" TextColor="{DynamicResource SecondaryTextColor}" />
+                        </Border>
+                    </Grid>
+                    <Grid ColumnDefinitions="110,*" ColumnSpacing="14" VerticalOptions="Center">
+                        <Border HeightRequest="100" WidthRequest="100" Stroke="{DynamicResource BorderColor}"
+                                StrokeShape="RoundRectangle 12" BackgroundColor="{DynamicResource SurfaceMutedColor}">
+                            <Image Source="{Binding Matricula.LaudoMedico, Converter={StaticResource FotoToImageSourceConverter}}"
+                                   WidthRequest="100" HeightRequest="100" Aspect="AspectFill" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
+                            <Button Text="Selecionar imagem" Command="{Binding SelecionarFotoCommand}"
+                                    BackgroundColor="{DynamicResource BrandSoftColor}" TextColor="{DynamicResource BrandDarkColor}"
+                                    CornerRadius="12" />
+                            <Button Text="Remover laudo" Command="{Binding RemoverLaudoCommand}"
+                                    IsVisible="{Binding HasLaudo}"
+                                    BackgroundColor="{DynamicResource SurfaceMutedColor}" TextColor="{DynamicResource PrimaryTextColor}"
+                                    CornerRadius="12" />
+                        </VerticalStackLayout>
+                    </Grid>
+                    <Label Text="Anexe a imagem do parecer médico. O arquivo fica salvo junto à matrícula."
+                           FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                               Color="{DynamicResource BrandColor}" HorizontalOptions="Center" />
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <Button Text="Cancelar" Command="{Binding CancelCommand}" BackgroundColor="{DynamicResource SurfaceMutedColor}"
+                        TextColor="{DynamicResource PrimaryTextColor}" CornerRadius="14" HeightRequest="50" />
+                <Button Grid.Column="1" Text="{Binding SaveButtonText}" Command="{Binding SaveMatriculaCommand}"
+                        BackgroundColor="{DynamicResource BrandColor}" TextColor="White" FontAttributes="Bold"
+                        CornerRadius="14" HeightRequest="50" />
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

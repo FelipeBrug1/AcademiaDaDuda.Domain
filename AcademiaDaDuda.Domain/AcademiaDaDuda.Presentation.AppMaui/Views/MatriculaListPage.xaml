@@ -5,9 +5,15 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:AcademiaDaDuda.Presentation.AppMaui.ViewModels"
     xmlns:dto="clr-namespace:AcademiaDaDuda.Application.DTOs;assembly=AcademiaDaDuda.Application"
+    xmlns:converters="clr-namespace:AcademiaDaDuda.Presentation.AppMaui.Converters"
     x:DataType="vm:MatriculaListViewModel"
     Title="Matrículas"
     BackgroundColor="{DynamicResource PageBackgroundColor}">
+    <ContentPage.Resources>
+        <converters:FotoToImageSourceConverter x:Key="FotoToImageSourceConverter" />
+        <converters:EnumDisplayConverter x:Key="EnumDisplay" />
+    </ContentPage.Resources>
+
     <Grid RowDefinitions="Auto,Auto,*" RowSpacing="14">
         <Grid.Padding>
             <OnPlatform x:TypeArguments="Thickness">
@@ -18,18 +24,26 @@
             </OnPlatform>
         </Grid.Padding>
 
-        <VerticalStackLayout Spacing="3">
-            <Label Text="Matrículas" FontSize="27" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
-            <Label Text="{Binding Matriculas.Count, StringFormat='{0:N0} cadastros'}" FontSize="13" TextColor="{DynamicResource SecondaryTextColor}" />
-        </VerticalStackLayout>
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <VerticalStackLayout Spacing="3" VerticalOptions="Center">
+                <Label Text="Matrículas" FontSize="27" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                <Label Text="{Binding Matriculas.Count, StringFormat='{0:N0} cadastros'}" FontSize="13" TextColor="{DynamicResource SecondaryTextColor}" />
+            </VerticalStackLayout>
+            <Button Grid.Column="1" Text="＋ Nova matrícula" Command="{Binding AddMatriculaCommand}"
+                    BackgroundColor="{DynamicResource BrandColor}" TextColor="White" FontAttributes="Bold"
+                    VerticalOptions="Center" CornerRadius="14" />
+        </Grid>
 
         <Border Grid.Row="1" Padding="10" BackgroundColor="{DynamicResource SurfaceColor}"
                 Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 16">
-            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
-                <Entry Text="{Binding SearchText}" Placeholder="Buscar por aluno, plano ou objetivo"
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                <Picker Title="Campo" WidthRequest="145" ItemsSource="{Binding FilterTypes}"
+                        SelectedItem="{Binding SelectedFilterType}" FontSize="13"
+                        TextColor="{DynamicResource PrimaryTextColor}" />
+                <Entry Grid.Column="1" Text="{Binding SearchText}" Placeholder="Digite o valor da busca"
                        ReturnType="Search" ReturnCommand="{Binding SearchMatriculasCommand}"
                        ClearButtonVisibility="WhileEditing" VerticalOptions="Center" />
-                <Button Grid.Column="1" Text="⌕" Command="{Binding SearchMatriculasCommand}"
+                <Button Grid.Column="2" Text="Buscar" Command="{Binding SearchMatriculasCommand}"
                         BackgroundColor="{DynamicResource BrandSoftColor}" TextColor="{DynamicResource BrandDarkColor}"
                         CornerRadius="12" Padding="14,8" SemanticProperties.Hint="Buscar matrículas" />
             </Grid>
@@ -42,27 +56,58 @@
                         <VerticalStackLayout Padding="25" Spacing="10" VerticalOptions="Center">
                             <Label Text="Nenhuma matrícula encontrada" FontSize="18" FontAttributes="Bold"
                                    TextColor="{DynamicResource PrimaryTextColor}" HorizontalTextAlignment="Center" />
-                            <Label Text="As matrículas cadastradas aparecerão aqui. Você também pode buscar pelo nome do aluno, plano ou objetivo."
+                            <Label Text="As matrículas cadastradas aparecerão aqui. Você pode buscar por aluno, plano, objetivo ou identificador."
                                    FontSize="14" TextColor="{DynamicResource SecondaryTextColor}" HorizontalTextAlignment="Center" />
+                            <Button Text="Criar matrícula" Command="{Binding AddMatriculaCommand}"
+                                    BackgroundColor="{DynamicResource BrandColor}" TextColor="White" CornerRadius="14"
+                                    HorizontalOptions="Center" />
                         </VerticalStackLayout>
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="dto:MatriculaDto">
-                            <Border Margin="0,0,0,8" Padding="16" BackgroundColor="{DynamicResource SurfaceColor}"
+                            <Border Margin="0,0,0,10" Padding="15" BackgroundColor="{DynamicResource SurfaceColor}"
                                     Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18">
-                                <VerticalStackLayout Spacing="6">
-                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
-                                        <Label Text="{Binding AlunoMatricula.Nome}" FontSize="17" FontAttributes="Bold"
-                                               TextColor="{DynamicResource PrimaryTextColor}" VerticalOptions="Center" />
-                                        <Label Grid.Column="1" Text="{Binding Plano}" FontSize="13" FontAttributes="Bold"
-                                               TextColor="{DynamicResource BrandColor}" VerticalOptions="Center" />
+                                <VerticalStackLayout Spacing="10">
+                                    <Grid ColumnDefinitions="72,*" ColumnSpacing="12">
+                                        <Border HeightRequest="68" WidthRequest="68" StrokeThickness="0"
+                                                BackgroundColor="{DynamicResource SurfaceMutedColor}"
+                                                StrokeShape="RoundRectangle 34" VerticalOptions="Start">
+                                            <Image Source="{Binding AlunoMatricula.Foto, Converter={StaticResource FotoToImageSourceConverter}}"
+                                                   HeightRequest="68" WidthRequest="68" Aspect="AspectFill" />
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                                <Label Text="{Binding AlunoMatricula.Nome}" FontSize="17" FontAttributes="Bold"
+                                                       TextColor="{DynamicResource PrimaryTextColor}" VerticalOptions="Center"
+                                                       LineBreakMode="TailTruncation" />
+                                                <Label Grid.Column="1" Text="{Binding Plano, Converter={StaticResource EnumDisplay}}"
+                                                       FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource BrandColor}"
+                                                       VerticalOptions="Center" />
+                                            </Grid>
+                                            <Label Text="{Binding AlunoMatricula.Cpf, StringFormat='CPF: {0}'}" FontSize="12"
+                                                   TextColor="{DynamicResource SecondaryTextColor}" />
+                                            <Label Text="{Binding AlunoMatricula.DataNascimento, StringFormat='Nascimento: {0:dd/MM/yyyy}'}" FontSize="12"
+                                                   TextColor="{DynamicResource SecondaryTextColor}" />
+                                        </VerticalStackLayout>
                                     </Grid>
-                                    <Label Text="{Binding Objetivo, StringFormat='Objetivo: {0}'}" FontSize="13"
-                                           TextColor="{DynamicResource SecondaryTextColor}" />
                                     <Label Text="{Binding DataInicio, StringFormat='Início: {0:dd/MM/yyyy}'}" FontSize="12"
                                            TextColor="{DynamicResource SecondaryTextColor}" />
-                                    <Label Text="{Binding DataFim, StringFormat='Válida até: {0:dd/MM/yyyy}'}" FontSize="12"
+                                    <Label Text="{Binding DataFim, StringFormat='Término: {0:dd/MM/yyyy}'}" FontSize="12"
                                            TextColor="{DynamicResource SecondaryTextColor}" />
+                                    <Label Text="{Binding Objetivo, StringFormat='Objetivo: {0}'}" FontSize="13"
+                                           TextColor="{DynamicResource PrimaryTextColor}" />
+                                    <Label Text="{Binding RestricoesMedicas, Converter={StaticResource EnumDisplay}, StringFormat='Restrições: {0}'}"
+                                           FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
+                                    <Label Text="{Binding ObservacoesRestricoes, StringFormat='Observações: {0}'}" FontSize="12"
+                                           TextColor="{DynamicResource SecondaryTextColor}" />
+                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                        <Button Text="Editar" Clicked="OnEditButtonClicked" CommandParameter="{Binding .}"
+                                                BackgroundColor="{DynamicResource BrandSoftColor}" TextColor="{DynamicResource BrandDarkColor}"
+                                                CornerRadius="11" />
+                                        <Button Grid.Column="1" Text="Excluir" Clicked="OnDeleteButtonClicked" CommandParameter="{Binding .}"
+                                                BackgroundColor="{DynamicResource SurfaceMutedColor}" TextColor="{DynamicResource PrimaryTextColor}"
+                                                CornerRadius="11" />
+                                    </Grid>
                                 </VerticalStackLayout>
                             </Border>
                         </DataTemplate>

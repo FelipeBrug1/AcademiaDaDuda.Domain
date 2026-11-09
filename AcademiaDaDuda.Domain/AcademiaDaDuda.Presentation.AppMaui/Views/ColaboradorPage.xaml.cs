@@ -16,4 +16,13 @@ public partial class ColaboradorPage : ContentPage
         if (BindingContext is ColaboradorViewModel viewModel)
             await viewModel.InitializeAsync();
     }
+
+    private void OnShowPasswordToggled(object? sender, ToggledEventArgs e)
+    {
+        if (SenhaEntry is null || ConfirmarSenhaEntry is null)
+            return;
+
+        SenhaEntry.IsPassword = !e.Value;
+        ConfirmarSenhaEntry.IsPassword = !e.Value;
+    }
 }

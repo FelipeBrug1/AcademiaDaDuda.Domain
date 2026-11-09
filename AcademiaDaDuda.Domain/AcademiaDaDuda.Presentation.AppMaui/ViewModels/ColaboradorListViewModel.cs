@@ -77,8 +77,10 @@ public partial class ColaboradorListViewModel : BaseViewModel
             IsBusy = true;
             await _databaseSettingsStartup.EnsureInitializedAsync();
             using var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            var all = await _colaboradorService.ObterTodosAsync(cancellation.Token);
             var term = SearchText.Trim();
+            IEnumerable<ColaboradorDto> all = string.IsNullOrWhiteSpace(term) || SelectedFilterType != "CPF"
+                ? await _colaboradorService.ObterTodosAsync(cancellation.Token)
+                : Array.Empty<ColaboradorDto>();
             IEnumerable<ColaboradorDto> results = all;
 
             if (!string.IsNullOrWhiteSpace(term))
@@ -87,12 +89,9 @@ public partial class ColaboradorListViewModel : BaseViewModel
                 {
                     case "CPF":
                         var cpf = DigitsOnly(term);
-                        if (cpf.Length != 11)
-                        {
-                            await Shell.Current.DisplayAlertAsync("Busca por CPF", "Informe os 11 dígitos do CPF.", "OK");
-                            return;
-                        }
-                        results = all.Where(colaborador => DigitsOnly(colaborador.Cpf) == cpf);
+                        results = cpf.Length == 0
+                            ? string.IsNullOrWhiteSpace(term) ? all : Enumerable.Empty<ColaboradorDto>()
+                            : await _colaboradorService.ObterPorCpfPrefixoAsync(cpf, cancellation.Token);
                         break;
 
                     case "ID":

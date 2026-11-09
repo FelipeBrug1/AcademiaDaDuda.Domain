@@ -42,6 +42,7 @@
                         TextColor="{DynamicResource PrimaryTextColor}" />
                 <Entry Grid.Column="1" Text="{Binding SearchText}" Placeholder="Buscar colaborador"
                        ReturnType="Search" ReturnCommand="{Binding SearchColaboradoresCommand}"
+                       TextChanged="OnSearchDebounceTextChanged"
                        ClearButtonVisibility="WhileEditing" VerticalOptions="Center" />
                 <Button Grid.Column="2" Text="⌕" Command="{Binding SearchColaboradoresCommand}"
                         BackgroundColor="{DynamicResource BrandSoftColor}" TextColor="{DynamicResource BrandDarkColor}"

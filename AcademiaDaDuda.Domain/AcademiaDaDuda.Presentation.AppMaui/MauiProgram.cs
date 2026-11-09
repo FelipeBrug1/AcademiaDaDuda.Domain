@@ -43,6 +43,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ColaboradorListViewModel>();
         builder.Services.AddTransient<ColaboradorViewModel>();
         builder.Services.AddTransient<MatriculaListViewModel>();
+        builder.Services.AddTransient<MatriculaViewModel>();
         builder.Services.AddTransient<DashboardPage>();
         builder.Services.AddTransient<SettingsPage>();
         builder.Services.AddTransient<LogradouroListPage>();
@@ -52,6 +53,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ColaboradorListPage>();
         builder.Services.AddTransient<ColaboradorPage>();
         builder.Services.AddTransient<MatriculaListPage>();
+        builder.Services.AddTransient<MatriculaPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();

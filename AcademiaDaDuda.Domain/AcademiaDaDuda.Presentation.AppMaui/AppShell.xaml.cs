@@ -13,6 +13,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute(nameof(LogradouroPage), typeof(LogradouroPage));
         Routing.RegisterRoute(nameof(AlunoPage), typeof(AlunoPage));
         Routing.RegisterRoute(nameof(ColaboradorPage), typeof(ColaboradorPage));
+        Routing.RegisterRoute(nameof(MatriculaPage), typeof(MatriculaPage));
 
         var dashboard = new FlyoutItem
         {

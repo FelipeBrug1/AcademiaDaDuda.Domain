@@ -63,13 +63,22 @@ BEGIN
         data_inicio DATE NOT NULL,
         data_fim DATE NOT NULL,
         objetivo NVARCHAR(500) NOT NULL,
-        restricao_medica BIT NOT NULL CONSTRAINT df_tb_matricula_restricao DEFAULT 0,
+        restricao_medica TINYINT NOT NULL CONSTRAINT df_tb_matricula_restricao DEFAULT 0,
         obs_restricao NVARCHAR(MAX) NULL,
         laudo_medico VARBINARY(MAX) NULL,
         CONSTRAINT fk_tb_matricula_aluno FOREIGN KEY (aluno_id)
             REFERENCES dbo.tb_aluno (id_aluno) ON DELETE CASCADE ON UPDATE CASCADE
     );
 END;
+IF EXISTS (
+    SELECT 1
+    FROM sys.columns c
+    JOIN sys.types t ON c.user_type_id = t.user_type_id
+    WHERE c.object_id = OBJECT_ID(N'dbo.tb_matricula')
+      AND c.name = N'restricao_medica'
+      AND t.name = N'bit'
+)
+    ALTER TABLE dbo.tb_matricula ALTER COLUMN restricao_medica TINYINT NOT NULL;
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE object_id = OBJECT_ID(N'dbo.tb_matricula') AND name = N'ix_tb_matricula_aluno_id')
     CREATE INDEX ix_tb_matricula_aluno_id ON dbo.tb_matricula (aluno_id);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE object_id = OBJECT_ID(N'dbo.tb_matricula') AND name = N'ix_tb_matricula_data_fim')

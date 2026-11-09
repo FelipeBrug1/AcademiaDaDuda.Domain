@@ -52,6 +52,19 @@ public partial class SettingsViewModel : BaseViewModel
     public bool IsServerDatabase => !IsSqlite;
     public bool IsSqlServer => SelectedDatabaseType == "SQL Server";
 
+    public void ApplySelectedTheme()
+    {
+        var theme = SelectedTheme switch
+        {
+            "Claro" => AppTheme.Light,
+            "Escuro" => AppTheme.Dark,
+            _ => AppTheme.Unspecified
+        };
+
+        Preferences.Set(DatabaseSettingsStartup.ThemeKey, theme.ToString());
+        WeakReferenceMessenger.Default.Send(new TemaPreferenciasAtualizadasMessage(theme));
+    }
+
     public SettingsViewModel(DatabaseSettingsStartup databaseSettingsStartup)
     {
         _databaseSettingsStartup = databaseSettingsStartup;
