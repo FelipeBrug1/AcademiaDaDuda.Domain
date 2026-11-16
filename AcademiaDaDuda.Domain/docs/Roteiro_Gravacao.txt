@@ -10,10 +10,10 @@ Fluxo obrigatório de controle de acesso
 1. No dashboard, mostre o logo da Academia da Duda com o nome completo do autor.
 2. Abra Controle de Acesso e selecione o modo Aluno.
 3. Escolha o aluno sem matrícula ativa e tente registrar a entrada. Mostre a mensagem de acesso negado.
-4. Escolha o aluno com matrícula ativa e registre a entrada. Mostre o nome completo, a confirmação, os dias restantes do plano e o registro na lista do dia.
-5. Sem trocar de aluno, registre a saída. Mostre o tempo de permanência e o novo registro na lista.
-6. Mude para Colaborador, escolha o colaborador e registre a entrada.
-7. Registre a saída do mesmo colaborador e mostre os dois horários no histórico do dia.
+4. Pesquise e selecione o aluno com matrícula ativa pelo nome completo. Registre a entrada e mostre o nome completo, a confirmação e o evento no histórico do dia.
+5. Sem trocar o aluno selecionado, registre a saída. Mostre o nome completo e os registros de entrada e saída no histórico do dia.
+6. Mude para Colaborador, pesquise e selecione o colaborador pelo nome completo. Registre a entrada e mostre o nome completo e a confirmação.
+7. Sem trocar o colaborador selecionado, registre a saída. Mostre o nome completo e os registros de entrada e saída no histórico do dia.
 8. Finalize retornando ao dashboard.
 
 O aplicativo registra cada evento com data e hora local. Alunos sem matrícula ativa não geram registro de entrada. A saída de uma pessoa que já está na academia permanece disponível para encerrar a visita.
