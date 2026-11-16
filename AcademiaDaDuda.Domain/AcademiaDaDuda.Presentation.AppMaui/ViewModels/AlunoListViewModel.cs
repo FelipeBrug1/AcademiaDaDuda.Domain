@@ -4,6 +4,7 @@ using AcademiaDaDuda.Presentation.AppMaui.Configuration;
 using AcademiaDaDuda.Presentation.AppMaui.Views;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using AcademiaDaDuda.Presentation.AppMaui.Localization;
 
 namespace AcademiaDaDuda.Presentation.AppMaui.ViewModels;
 
@@ -13,10 +14,11 @@ public partial class AlunoListViewModel : BaseViewModel
     private readonly DatabaseSettingsStartup _databaseSettingsStartup;
 
     public ObservableCollection<AlunoDto> Alunos { get; } = [];
-    public ObservableCollection<string> FilterTypes { get; } = ["Nome", "CPF", "ID", "E-mail"];
+    public ObservableCollection<LocalizedOption> FilterTypes { get; } =
+        [new("Nome"), new("CPF"), new("ID"), new("E-mail")];
 
     private string _searchText = string.Empty;
-    private string _selectedFilterType = "Nome";
+    private LocalizedOption _selectedFilterType = null!;
 
     public string SearchText
     {
@@ -24,7 +26,7 @@ public partial class AlunoListViewModel : BaseViewModel
         set => SetProperty(ref _searchText, value);
     }
 
-    public string SelectedFilterType
+    public LocalizedOption SelectedFilterType
     {
         get => _selectedFilterType;
         set => SetProperty(ref _selectedFilterType, value);
@@ -34,7 +36,8 @@ public partial class AlunoListViewModel : BaseViewModel
     {
         _alunoService = alunoService;
         _databaseSettingsStartup = databaseSettingsStartup;
-        Title = "Alunos";
+        SelectedFilterType = FilterTypes[0];
+        SetTitle("Alunos");
     }
 
     [RelayCommand]
@@ -52,11 +55,11 @@ public partial class AlunoListViewModel : BaseViewModel
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "O carregamento dos alunos demorou mais que o esperado.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "O carregamento dos alunos demorou mais que o esperado.", "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro ao carregar", $"Não foi possível carregar os alunos. {exception.Message}", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro ao carregar", global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizationManager.Instance.Format("Não foi possível carregar os alunos. {0}", exception.Message), "OK");
         }
         finally
         {
@@ -82,13 +85,13 @@ public partial class AlunoListViewModel : BaseViewModel
 
             if (!string.IsNullOrWhiteSpace(term))
             {
-                switch (SelectedFilterType)
+                switch (SelectedFilterType.Key)
                 {
                     case "CPF":
                         var cpf = DigitsOnly(term);
                         if (cpf.Length != 11)
                         {
-                            await Shell.Current.DisplayAlertAsync("Busca por CPF", "Informe os 11 dígitos do CPF.", "OK");
+                            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Busca por CPF", "Informe os 11 dígitos do CPF.", "OK");
                             return;
                         }
                         results = all.Where(aluno => DigitsOnly(aluno.Cpf) == cpf);
@@ -97,7 +100,7 @@ public partial class AlunoListViewModel : BaseViewModel
                     case "ID":
                         if (!int.TryParse(term, out var id) || id <= 0)
                         {
-                            await Shell.Current.DisplayAlertAsync("Busca por ID", "Informe um número inteiro maior que zero.", "OK");
+                            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Busca por ID", "Informe um número inteiro maior que zero.", "OK");
                             return;
                         }
                         results = all.Where(aluno => aluno.Id == id);
@@ -117,11 +120,11 @@ public partial class AlunoListViewModel : BaseViewModel
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "A busca demorou mais que o esperado.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "A busca demorou mais que o esperado.", "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro na busca", exception.Message, "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro na busca", exception.Message, "OK");
         }
         finally
         {
@@ -153,9 +156,9 @@ public partial class AlunoListViewModel : BaseViewModel
         if (aluno is null || IsBusy)
             return;
 
-        var confirmed = await Shell.Current.DisplayAlertAsync(
+        var confirmed = await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync(
             "Excluir aluno",
-            $"Deseja realmente excluir {aluno.Nome}?",
+            global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizationManager.Instance.Format("Deseja realmente excluir {0}?", aluno.Nome),
             "Excluir",
             "Cancelar");
         if (!confirmed)
@@ -169,24 +172,24 @@ public partial class AlunoListViewModel : BaseViewModel
             if (await _alunoService.RemoverAsync(aluno.Id, cancellation.Token))
             {
                 Alunos.Remove(aluno);
-                await Shell.Current.DisplayAlertAsync("Concluído", "Aluno excluído.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Concluído", "Aluno excluído.", "OK");
             }
             else
             {
-                await Shell.Current.DisplayAlertAsync("Não encontrado", "Esse aluno já foi removido.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Não encontrado", "Esse aluno já foi removido.", "OK");
                 await LoadAlunosAsync();
             }
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "A exclusão demorou mais que o esperado.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "A exclusão demorou mais que o esperado.", "OK");
         }
         catch (Exception exception)
         {
             if (HasForeignKeyError(exception))
-                await Shell.Current.DisplayAlertAsync("Exclusão não permitida", "Este aluno possui matrículas ou acessos vinculados e não pode ser excluído.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Exclusão não permitida", "Este aluno possui matrículas ou acessos vinculados e não pode ser excluído.", "OK");
             else
-                await Shell.Current.DisplayAlertAsync("Erro ao excluir", exception.Message, "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro ao excluir", exception.Message, "OK");
         }
         finally
         {

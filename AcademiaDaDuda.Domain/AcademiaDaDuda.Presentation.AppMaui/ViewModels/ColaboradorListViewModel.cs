@@ -5,6 +5,7 @@ using AcademiaDaDuda.Presentation.AppMaui.Configuration;
 using AcademiaDaDuda.Presentation.AppMaui.Views;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using AcademiaDaDuda.Presentation.AppMaui.Localization;
 
 namespace AcademiaDaDuda.Presentation.AppMaui.ViewModels;
 
@@ -12,12 +13,14 @@ public partial class ColaboradorListViewModel : BaseViewModel
 {
     private readonly IColaboradorService _colaboradorService;
     private readonly DatabaseSettingsStartup _databaseSettingsStartup;
+    private List<ColaboradorDto> _visibleColaboradores = [];
 
     public ObservableCollection<ColaboradorDto> Colaboradores { get; } = [];
-    public ObservableCollection<string> FilterTypes { get; } = ["Nome", "CPF", "ID", "E-mail", "Tipo", "Vínculo"];
+    public ObservableCollection<LocalizedOption> FilterTypes { get; } =
+        [new("Nome"), new("CPF"), new("ID"), new("E-mail"), new("Tipo"), new("Vínculo")];
 
     private string _searchText = string.Empty;
-    private string _selectedFilterType = "Nome";
+    private LocalizedOption _selectedFilterType = null!;
 
     public string SearchText
     {
@@ -25,7 +28,7 @@ public partial class ColaboradorListViewModel : BaseViewModel
         set => SetProperty(ref _searchText, value);
     }
 
-    public string SelectedFilterType
+    public LocalizedOption SelectedFilterType
     {
         get => _selectedFilterType;
         set => SetProperty(ref _selectedFilterType, value);
@@ -35,8 +38,11 @@ public partial class ColaboradorListViewModel : BaseViewModel
     {
         _colaboradorService = colaboradorService;
         _databaseSettingsStartup = databaseSettingsStartup;
-        Title = "Colaboradores";
+        SelectedFilterType = FilterTypes[0];
+        SetTitle("Colaboradores");
     }
+
+    protected override void OnCultureChanged() => ReplaceItems(_visibleColaboradores);
 
     [RelayCommand]
     private async Task LoadColaboradoresAsync()
@@ -53,11 +59,11 @@ public partial class ColaboradorListViewModel : BaseViewModel
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "O carregamento dos colaboradores demorou mais que o esperado.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "O carregamento dos colaboradores demorou mais que o esperado.", "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro ao carregar", $"Não foi possível carregar os colaboradores. {exception.Message}", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro ao carregar", global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizationManager.Instance.Format("Não foi possível carregar os colaboradores. {0}", exception.Message), "OK");
         }
         finally
         {
@@ -78,14 +84,14 @@ public partial class ColaboradorListViewModel : BaseViewModel
             await _databaseSettingsStartup.EnsureInitializedAsync();
             using var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             var term = SearchText.Trim();
-            IEnumerable<ColaboradorDto> all = string.IsNullOrWhiteSpace(term) || SelectedFilterType != "CPF"
+            IEnumerable<ColaboradorDto> all = string.IsNullOrWhiteSpace(term) || SelectedFilterType.Key != "CPF"
                 ? await _colaboradorService.ObterTodosAsync(cancellation.Token)
                 : Array.Empty<ColaboradorDto>();
             IEnumerable<ColaboradorDto> results = all;
 
             if (!string.IsNullOrWhiteSpace(term))
             {
-                switch (SelectedFilterType)
+                switch (SelectedFilterType.Key)
                 {
                     case "CPF":
                         var cpf = DigitsOnly(term);
@@ -97,7 +103,7 @@ public partial class ColaboradorListViewModel : BaseViewModel
                     case "ID":
                         if (!int.TryParse(term, out var id) || id <= 0)
                         {
-                            await Shell.Current.DisplayAlertAsync("Busca por ID", "Informe um número inteiro maior que zero.", "OK");
+                            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Busca por ID", "Informe um número inteiro maior que zero.", "OK");
                             return;
                         }
                         results = all.Where(colaborador => colaborador.Id == id);
@@ -109,11 +115,11 @@ public partial class ColaboradorListViewModel : BaseViewModel
 
                     case "Tipo":
                         var tipos = Enum.GetValues<AppColaboradorTipo>()
-                            .Where(tipo => Contains(tipo.ToString(), term) || Contains(tipo.GetDisplayName(), term))
+                            .Where(tipo => Contains(tipo.ToString(), term) || Contains(LocalizationManager.Instance.Translate(tipo.GetDisplayName()), term))
                             .ToHashSet();
                         if (tipos.Count == 0)
                         {
-                            await Shell.Current.DisplayAlertAsync("Busca por tipo", "Informe Administrador, Atendente ou Instrutor.", "OK");
+                            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Busca por tipo", "Informe Administrador, Atendente ou Instrutor.", "OK");
                             return;
                         }
                         results = all.Where(colaborador => tipos.Contains(colaborador.Tipo));
@@ -121,11 +127,11 @@ public partial class ColaboradorListViewModel : BaseViewModel
 
                     case "Vínculo":
                         var vinculos = Enum.GetValues<AppColaboradorVinculo>()
-                            .Where(vinculo => Contains(vinculo.ToString(), term) || Contains(vinculo.GetDisplayName(), term))
+                            .Where(vinculo => Contains(vinculo.ToString(), term) || Contains(LocalizationManager.Instance.Translate(vinculo.GetDisplayName()), term))
                             .ToHashSet();
                         if (vinculos.Count == 0)
                         {
-                            await Shell.Current.DisplayAlertAsync("Busca por vínculo", "Informe CLT ou Estagiário.", "OK");
+                            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Busca por vínculo", "Informe CLT ou Estagiário.", "OK");
                             return;
                         }
                         results = all.Where(colaborador => vinculos.Contains(colaborador.Vinculo));
@@ -141,11 +147,11 @@ public partial class ColaboradorListViewModel : BaseViewModel
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "A busca demorou mais que o esperado.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "A busca demorou mais que o esperado.", "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro na busca", exception.Message, "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro na busca", exception.Message, "OK");
         }
         finally
         {
@@ -177,9 +183,9 @@ public partial class ColaboradorListViewModel : BaseViewModel
         if (colaborador is null || IsBusy)
             return;
 
-        var confirmed = await Shell.Current.DisplayAlertAsync(
+        var confirmed = await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync(
             "Excluir colaborador",
-            $"Deseja realmente excluir {colaborador.Nome}?",
+            global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizationManager.Instance.Format("Deseja realmente excluir {0}?", colaborador.Nome),
             "Excluir",
             "Cancelar");
         if (!confirmed)
@@ -193,24 +199,24 @@ public partial class ColaboradorListViewModel : BaseViewModel
             if (await _colaboradorService.RemoverAsync(colaborador.Id, cancellation.Token))
             {
                 Colaboradores.Remove(colaborador);
-                await Shell.Current.DisplayAlertAsync("Concluído", "Colaborador excluído.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Concluído", "Colaborador excluído.", "OK");
             }
             else
             {
-                await Shell.Current.DisplayAlertAsync("Não encontrado", "Esse colaborador já foi removido.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Não encontrado", "Esse colaborador já foi removido.", "OK");
                 await LoadColaboradoresAsync();
             }
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "A exclusão demorou mais que o esperado.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "A exclusão demorou mais que o esperado.", "OK");
         }
         catch (Exception exception)
         {
             if (HasForeignKeyError(exception))
-                await Shell.Current.DisplayAlertAsync("Exclusão não permitida", "Este colaborador possui acessos ou registros vinculados e não pode ser excluído.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Exclusão não permitida", "Este colaborador possui acessos ou registros vinculados e não pode ser excluído.", "OK");
             else
-                await Shell.Current.DisplayAlertAsync("Erro ao excluir", exception.Message, "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro ao excluir", exception.Message, "OK");
         }
         finally
         {
@@ -220,8 +226,9 @@ public partial class ColaboradorListViewModel : BaseViewModel
 
     private void ReplaceItems(IEnumerable<ColaboradorDto> items)
     {
+        _visibleColaboradores = items.ToList();
         Colaboradores.Clear();
-        foreach (var item in items)
+        foreach (var item in _visibleColaboradores)
             Colaboradores.Add(item);
     }
 

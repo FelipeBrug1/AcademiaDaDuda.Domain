@@ -3,6 +3,7 @@
 using AcademiaDaDuda.Application.DependencyInjection;
 using AcademiaDaDuda.Application.Enums;
 using AcademiaDaDuda.Presentation.AppMaui.Configuration;
+using AcademiaDaDuda.Presentation.AppMaui.Localization;
 using AcademiaDaDuda.Presentation.AppMaui.ViewModels;
 using AcademiaDaDuda.Presentation.AppMaui.Views;
 using Microsoft.Extensions.Logging;
@@ -24,6 +25,9 @@ public static class MauiProgram
                 fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialIcons");
             });
 
+        LocalizationManager.Instance.InitializeFromPreferences();
+        builder.Services.AddSingleton<LocalizationManager>(LocalizationManager.Instance);
+
         var databasePath = Path.Combine(FileSystem.AppDataDirectory, "academia-da-duda.db3");
         builder.Services.AddSingleton(new RepositoryConfig
         {
@@ -44,6 +48,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ColaboradorViewModel>();
         builder.Services.AddTransient<MatriculaListViewModel>();
         builder.Services.AddTransient<MatriculaViewModel>();
+        builder.Services.AddTransient<AcessoViewModel>();
         builder.Services.AddTransient<DashboardPage>();
         builder.Services.AddTransient<SettingsPage>();
         builder.Services.AddTransient<LogradouroListPage>();
@@ -54,6 +59,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ColaboradorPage>();
         builder.Services.AddTransient<MatriculaListPage>();
         builder.Services.AddTransient<MatriculaPage>();
+        builder.Services.AddTransient<AcessoPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();

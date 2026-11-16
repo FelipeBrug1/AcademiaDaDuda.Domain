@@ -1,4 +1,5 @@
 using AcademiaDaDuda.Application.Enums;
+using AcademiaDaDuda.Presentation.AppMaui.Localization;
 using System.Globalization;
 
 namespace AcademiaDaDuda.Presentation.AppMaui.Converters;
@@ -6,7 +7,7 @@ namespace AcademiaDaDuda.Presentation.AppMaui.Converters;
 public sealed class EnumDisplayConverter : IValueConverter
 {
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) =>
-        value is Enum enumValue ? enumValue.GetDisplayName() : string.Empty;
+        value is Enum enumValue ? LocalizationManager.Instance.Translate(enumValue.GetDisplayName()) : string.Empty;
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
         throw new NotSupportedException("A conversão de exibição do enum é somente de ida.");

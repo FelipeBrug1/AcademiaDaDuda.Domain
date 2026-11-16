@@ -4,6 +4,7 @@ using AcademiaDaDuda.Application.Interfaces;
 using AcademiaDaDuda.Presentation.AppMaui.Configuration;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using AcademiaDaDuda.Presentation.AppMaui.Localization;
 
 namespace AcademiaDaDuda.Presentation.AppMaui.ViewModels;
 
@@ -20,14 +21,16 @@ public partial class DashboardViewModel : BaseViewModel
     private int _totalColaboradores;
     private int _totalMatriculas;
     private int _totalCadastros;
-    private string _ultimaAtualizacao = "Ainda não atualizado";
+    private DateTime? _lastUpdatedAt;
 
     public int TotalLogradouros { get => _totalLogradouros; private set => SetProperty(ref _totalLogradouros, value); }
     public int TotalAlunos { get => _totalAlunos; private set => SetProperty(ref _totalAlunos, value); }
     public int TotalColaboradores { get => _totalColaboradores; private set => SetProperty(ref _totalColaboradores, value); }
     public int TotalMatriculas { get => _totalMatriculas; private set => SetProperty(ref _totalMatriculas, value); }
     public int TotalCadastros { get => _totalCadastros; private set => SetProperty(ref _totalCadastros, value); }
-    public string UltimaAtualizacao { get => _ultimaAtualizacao; private set => SetProperty(ref _ultimaAtualizacao, value); }
+    public string UltimaAtualizacao => _lastUpdatedAt is { } updatedAt
+        ? LocalizationManager.Instance.Format("Atualizado em {0:g}", updatedAt)
+        : LocalizationManager.Instance.Translate("Ainda não atualizado");
 
     public DashboardViewModel(
         ILogradouroService logradouroService,
@@ -41,7 +44,7 @@ public partial class DashboardViewModel : BaseViewModel
         _colaboradorService = colaboradorService;
         _matriculaService = matriculaService;
         _databaseSettingsStartup = databaseSettingsStartup;
-        Title = "Dashboard";
+        SetTitle("Dashboard");
     }
 
     [RelayCommand]
@@ -66,15 +69,16 @@ public partial class DashboardViewModel : BaseViewModel
             TotalColaboradores = colaboradores.Count();
             TotalMatriculas = matriculas.Count();
             TotalCadastros = TotalLogradouros + TotalAlunos + TotalColaboradores + TotalMatriculas;
-            UltimaAtualizacao = $"Atualizado em {DateTime.Now:dd/MM/yyyy HH:mm}";
+            _lastUpdatedAt = DateTime.Now;
+            OnPropertyChanged(nameof(UltimaAtualizacao));
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "Não foi possível atualizar o resumo dentro do tempo esperado.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "Não foi possível atualizar o resumo dentro do tempo esperado.", "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro ao carregar", $"Não foi possível carregar o dashboard. {exception.Message}", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro ao carregar", global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizationManager.Instance.Format("Não foi possível carregar o dashboard. {0}", exception.Message), "OK");
         }
         finally
         {
@@ -93,4 +97,7 @@ public partial class DashboardViewModel : BaseViewModel
 
     [RelayCommand]
     private Task OpenMatriculasAsync() => Shell.Current.GoToAsync("//matriculas");
+
+    [RelayCommand]
+    private Task OpenAcessoAsync() => Shell.Current.GoToAsync("//acesso");
 }

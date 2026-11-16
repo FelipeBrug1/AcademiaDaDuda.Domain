@@ -50,7 +50,7 @@ public class AcessoColaboradorInfrastructureTests : TestBase
     private async Task<AcessoColaborador> CriarEInserirAcessoAsync(Colaborador? colaborador = null, DateTime? dataHora = null)
     {
         var targetColab = colaborador ?? await CriarEInserirColaboradorAsync();
-        var horario = dataHora ?? DateTime.Today.AddHours(8); // Dentro do intervalo comercial permitido (06:00 às 22:00)
+        var horario = dataHora ?? DateTime.Today.AddHours(8);
 
         var result = AcessoColaborador.Criar(0, targetColab, horario);
         if (result.IsFailure)

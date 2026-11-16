@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using AcademiaDaDuda.Presentation.AppMaui.Localization;
 
 namespace AcademiaDaDuda.Presentation.AppMaui.Views;
 
@@ -19,7 +20,7 @@ public partial class ColaboradorPage
 
         if (!EmailPattern.IsMatch(email))
         {
-            EmailErrorLabel.Text = "Formato de e-mail inválido. Use nome@dominio.com.";
+            EmailErrorLabel.Text = LocalizationManager.Instance.Translate("Formato de e-mail inválido. Use nome@dominio.com.");
             EmailErrorLabel.IsVisible = true;
             EmailEntry?.Focus();
             return;

@@ -7,13 +7,16 @@ Aplicativo multiplataforma em .NET MAUI para gestão de academia, com identidade
 - Cadastro, listagem, busca, edição e exclusão de alunos.
 - Cadastro, listagem, busca, edição e exclusão de colaboradores.
 - Cadastro, listagem, busca, edição e exclusão de matrículas, com seleção de aluno, plano, vigência calculada, restrições múltiplas e laudo médico.
+- Controle de entrada e saída de alunos e colaboradores, com data e hora registradas e histórico do dia.
+- Validação de matrícula ativa na entrada do aluno; o painel informa os dias restantes do plano e o tempo de permanência na saída.
+- Consulta da situação atual da pessoa na academia e pesquisa por nome ou CPF.
 - Busca parcial por CPF com debounce, além de busca por nome, e-mail e identificador nas listas; a busca exata por CPF nos formulários carrega um registro para edição.
 - Seleção de foto pela galeria e captura pela câmera, com a foto salva junto ao cadastro.
 - Validação imediata de e-mail, opção de exibir senhas e seleção de foto ao tocar na imagem do colaborador.
 - Aplicação imediata do tema ao escolhê-lo nas configurações.
 - Associação de aluno e colaborador a um logradouro já cadastrado, com validação dos dados pessoais e profissionais.
 - Confirmação antes de excluir e mensagem amigável para registros que ainda possuem vínculos.
-- Atalhos funcionais no dashboard para Alunos, Colaboradores e Matrículas.
+- Dashboard com a marca da academia e o nome completo do autor, resumo de cadastros e atalho para o controle de acesso.
 
 ## Como abrir e compilar
 
@@ -25,7 +28,7 @@ Os dados SQLite são gravados no diretório local de dados do aplicativo no disp
 
 ## Demonstração para gravação
 
-A sequência de gravação está em `docs/Roteiro_Gravacao.txt`. Use CPFs e e-mails de teste que ainda não existam no banco local.
+A sequência para demonstrar o acesso de aluno sem matrícula, aluno matriculado e colaborador está em `docs/Roteiro_Gravacao.txt`. Use dados fictícios e CPFs válidos ainda não cadastrados.
 
 ## Repositório
 

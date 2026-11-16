@@ -9,6 +9,7 @@ using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using LogradouroDto = AcademiaDaDuda.Application.DTOs.LogradouroDto;
+using AcademiaDaDuda.Presentation.AppMaui.Localization;
 
 namespace AcademiaDaDuda.Presentation.AppMaui.ViewModels;
 
@@ -26,7 +27,7 @@ public partial class MatriculaViewModel : BaseViewModel
     private bool _isEditMode;
     private MatriculaDto _matricula = NovaMatricula();
 
-    public IReadOnlyList<AppMatriculaPlano> PlanoTipos { get; } = Enum.GetValues<AppMatriculaPlano>();
+    public ObservableCollection<AppMatriculaPlano> PlanoTipos { get; } = new(Enum.GetValues<AppMatriculaPlano>());
     public ObservableCollection<RestricaoSelectable> RestricoesMulti { get; } = [];
 
     public MatriculaDto Matricula
@@ -61,7 +62,7 @@ public partial class MatriculaViewModel : BaseViewModel
         }
     }
 
-    public string SaveButtonText => IsEditMode ? "Salvar alterações" : "Criar matrícula";
+    public string SaveButtonText => LocalizationManager.Instance.Translate(IsEditMode ? "Salvar alterações" : "Criar matrícula");
     public bool StudentCpfIsReadOnly => IsEditMode;
     public bool HasAlunoVinculado => Matricula.AlunoMatricula?.Id > 0;
     public bool HasNoAlunoVinculado => !HasAlunoVinculado;
@@ -73,6 +74,15 @@ public partial class MatriculaViewModel : BaseViewModel
     public bool LaudoPendente => ExigeLaudo && !HasLaudo;
     public bool LaudoOpcional => !ExigeLaudo && !HasLaudo;
 
+    protected override void OnCultureChanged()
+    {
+        PlanoTipos.Clear();
+        foreach (var plano in Enum.GetValues<AppMatriculaPlano>())
+            PlanoTipos.Add(plano);
+        foreach (var item in RestricoesMulti)
+            item.RefreshLocalizedValue();
+    }
+
     public MatriculaViewModel(
         IMatriculaService matriculaService,
         IAlunoService alunoService,
@@ -81,7 +91,7 @@ public partial class MatriculaViewModel : BaseViewModel
         _matriculaService = matriculaService;
         _alunoService = alunoService;
         _databaseSettingsStartup = databaseSettingsStartup;
-        Title = "Nova matrícula";
+        SetTitle("Nova matrícula");
         BuildRestricoesMulti();
     }
 
@@ -94,13 +104,13 @@ public partial class MatriculaViewModel : BaseViewModel
         if (MatriculaId > 0)
         {
             IsEditMode = true;
-            Title = "Editar matrícula";
+            SetTitle("Editar matrícula");
             await LoadMatriculaAsync();
         }
         else
         {
             IsEditMode = false;
-            Title = "Nova matrícula";
+            SetTitle("Nova matrícula");
             Matricula = NovaMatricula();
             SyncSelectionFromFlags();
         }
@@ -144,22 +154,22 @@ public partial class MatriculaViewModel : BaseViewModel
             var matricula = await _matriculaService.ObterPorIdAsync(MatriculaId, cancellation.Token);
             if (matricula is null)
             {
-                await Shell.Current.DisplayAlertAsync("Matrícula não encontrada", "O registro solicitado não existe mais.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Matrícula não encontrada", "O registro solicitado não existe mais.", "OK");
                 await Shell.Current.GoToAsync("..");
                 return;
             }
 
             matricula.LaudoMedicoRemovido = false;
             Matricula = matricula;
-            Title = $"Matrícula {Matricula.Id}";
+            SetTitle("Matrícula {0}", Matricula.Id);
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "Não foi possível carregar a matrícula a tempo.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "Não foi possível carregar a matrícula a tempo.", "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro ao carregar", $"Não foi possível carregar a matrícula. {exception.Message}", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro ao carregar", global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizationManager.Instance.Format("Não foi possível carregar a matrícula. {0}", exception.Message), "OK");
         }
         finally
         {
@@ -173,7 +183,7 @@ public partial class MatriculaViewModel : BaseViewModel
         var cpf = DigitsOnly(Matricula.AlunoMatricula?.Cpf);
         if (cpf.Length != 11)
         {
-            await Shell.Current.DisplayAlertAsync("CPF inválido", "Informe os 11 dígitos do CPF do aluno.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("CPF inválido", "Informe os 11 dígitos do CPF do aluno.", "OK");
             return;
         }
 
@@ -185,22 +195,22 @@ public partial class MatriculaViewModel : BaseViewModel
             var aluno = await _alunoService.ObterPorCpfAsync(cpf, cancellation.Token);
             if (aluno is null)
             {
-                await Shell.Current.DisplayAlertAsync("Aluno não encontrado", "Nenhum aluno foi localizado com esse CPF.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Aluno não encontrado", "Nenhum aluno foi localizado com esse CPF.", "OK");
                 return;
             }
 
             Matricula.AlunoMatricula = aluno;
             OnPropertyChanged(nameof(Matricula));
             NotificarPropriedadesVisuais();
-            await Shell.Current.DisplayAlertAsync("Aluno localizado", "Os dados e a foto do aluno foram carregados.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Aluno localizado", "Os dados e a foto do aluno foram carregados.", "OK");
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "A consulta do aluno demorou mais que o esperado.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "A consulta do aluno demorou mais que o esperado.", "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro na busca", exception.Message, "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro na busca", exception.Message, "OK");
         }
         finally
         {
@@ -213,12 +223,12 @@ public partial class MatriculaViewModel : BaseViewModel
     {
         try
         {
-            var origem = await Shell.Current.DisplayActionSheetAsync("Laudo médico", "Cancelar", null, "Galeria", "Câmera");
+            var origem = await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayActionSheetAsync("Laudo médico", "Cancelar", null, "Galeria", "Câmera");
             FileResult? arquivo = origem switch
             {
                 "Galeria" => await FilePicker.Default.PickAsync(new PickOptions
                 {
-                    PickerTitle = "Selecione o laudo médico",
+                    PickerTitle = global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizationManager.Instance.Translate("Selecione o laudo médico"),
                     FileTypes = FilePickerFileType.Images
                 }),
                 "Câmera" => await PhotoCaptureService.CapturePhotoAsync(),
@@ -233,7 +243,7 @@ public partial class MatriculaViewModel : BaseViewModel
             await source.CopyToAsync(buffer);
             if (buffer.Length == 0 || buffer.Length > TamanhoMaximoLaudoBytes)
             {
-                await Shell.Current.DisplayAlertAsync("Arquivo inválido", "Selecione uma imagem válida de até 15 MB.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Arquivo inválido", "Selecione uma imagem válida de até 15 MB.", "OK");
                 return;
             }
 
@@ -244,7 +254,7 @@ public partial class MatriculaViewModel : BaseViewModel
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro ao selecionar laudo", exception.Message, "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro ao selecionar laudo", exception.Message, "OK");
         }
     }
 
@@ -280,7 +290,7 @@ public partial class MatriculaViewModel : BaseViewModel
 
             if (aluno is null)
             {
-                await Shell.Current.DisplayAlertAsync("Aluno não encontrado", "Busque um aluno cadastrado antes de salvar a matrícula.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Aluno não encontrado", "Busque um aluno cadastrado antes de salvar a matrícula.", "OK");
                 return;
             }
 
@@ -292,7 +302,7 @@ public partial class MatriculaViewModel : BaseViewModel
 
             if (!IsEditMode && await _matriculaService.PossuiMatriculaAtivaAsync(aluno.Id, cancellation.Token))
             {
-                await Shell.Current.DisplayAlertAsync("Matrícula ativa", "Este aluno já possui uma matrícula ativa. Uma nova matrícula só poderá ser criada depois do encerramento da atual.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Matrícula ativa", "Este aluno já possui uma matrícula ativa. Uma nova matrícula só poderá ser criada depois do encerramento da atual.", "OK");
                 return;
             }
 
@@ -301,23 +311,23 @@ public partial class MatriculaViewModel : BaseViewModel
             if (IsEditMode)
             {
                 await _matriculaService.AtualizarAsync(Matricula, cancellation.Token);
-                await Shell.Current.DisplayAlertAsync("Concluído", "Matrícula atualizada com sucesso.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Concluído", "Matrícula atualizada com sucesso.", "OK");
             }
             else
             {
                 await _matriculaService.AdicionarAsync(Matricula, cancellation.Token);
-                await Shell.Current.DisplayAlertAsync("Concluído", "Matrícula criada com sucesso.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Concluído", "Matrícula criada com sucesso.", "OK");
             }
 
             await Shell.Current.GoToAsync("..");
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "Não foi possível salvar a matrícula a tempo.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "Não foi possível salvar a matrícula a tempo.", "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro ao salvar", exception.Message, "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro ao salvar", exception.Message, "OK");
         }
         finally
         {
@@ -344,7 +354,7 @@ public partial class MatriculaViewModel : BaseViewModel
         if (errors.Count == 0)
             return true;
 
-        await Shell.Current.DisplayAlertAsync("Revise os dados", string.Join(Environment.NewLine, errors.Select(error => $"• {error}")), "OK");
+        await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Revise os dados", string.Join(Environment.NewLine, errors.Select(error => $"• {error}")), "OK");
         return false;
     }
 

@@ -1,4 +1,5 @@
 using Microsoft.Maui.Storage;
+using AcademiaDaDuda.Presentation.AppMaui.Localization;
 
 namespace AcademiaDaDuda.Presentation.AppMaui.Services;
 
@@ -9,12 +10,12 @@ internal static class PhotoCaptureService
 #if WINDOWS
         var mauiWindow = Microsoft.Maui.Controls.Application.Current?.Windows.FirstOrDefault();
         if (mauiWindow?.Handler?.PlatformView is not Microsoft.UI.Xaml.Window nativeWindow)
-            throw new InvalidOperationException("Não foi possível localizar a janela ativa para acessar a câmera.");
+            throw new InvalidOperationException(LocalizationManager.Instance.Translate("Não foi possível localizar a janela ativa para acessar a câmera."));
 
         var cameras = await Windows.Devices.Enumeration.DeviceInformation.FindAllAsync(
             Windows.Devices.Enumeration.DeviceClass.VideoCapture);
         if (cameras.Count == 0)
-            throw new InvalidOperationException("O Windows não encontrou uma câmera conectada.");
+            throw new InvalidOperationException(LocalizationManager.Instance.Translate("O Windows não encontrou uma câmera conectada."));
 
         using var capture = new Windows.Media.Capture.MediaCapture();
         try
@@ -28,7 +29,7 @@ internal static class PhotoCaptureService
         catch (UnauthorizedAccessException exception)
         {
             throw new InvalidOperationException(
-                "O acesso à câmera está bloqueado. Habilite o acesso para aplicativos da área de trabalho em Configurações do Windows > Privacidade e segurança > Câmera.",
+                LocalizationManager.Instance.Translate("O acesso à câmera está bloqueado. Habilite o acesso para aplicativos da área de trabalho em Configurações do Windows > Privacidade e segurança > Câmera."),
                 exception);
         }
 
@@ -39,11 +40,11 @@ internal static class PhotoCaptureService
                 source.Info.MediaStreamType == Windows.Media.Capture.MediaStreamType.VideoRecord &&
                 source.Info.SourceKind == Windows.Media.Capture.Frames.MediaFrameSourceKind.Color);
         if (frameSource is null)
-            throw new InvalidOperationException("A câmera conectou, mas não disponibilizou uma prévia de vídeo.");
+            throw new InvalidOperationException(LocalizationManager.Instance.Translate("A câmera conectou, mas não disponibilizou uma prévia de vídeo."));
 
         var xamlRoot = nativeWindow.Content?.XamlRoot;
         if (xamlRoot is null)
-            throw new InvalidOperationException("Não foi possível abrir a prévia da câmera nesta janela.");
+            throw new InvalidOperationException(LocalizationManager.Instance.Translate("Não foi possível abrir a prévia da câmera nesta janela."));
 
         var preview = new Microsoft.UI.Xaml.Controls.MediaPlayerElement
         {
@@ -55,10 +56,10 @@ internal static class PhotoCaptureService
 
         var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog
         {
-            Title = "Tirar foto",
+            Title = LocalizationManager.Instance.Translate("Tirar foto"),
             Content = preview,
-            PrimaryButtonText = "Capturar",
-            CloseButtonText = "Cancelar",
+            PrimaryButtonText = LocalizationManager.Instance.Translate("Capturar"),
+            CloseButtonText = LocalizationManager.Instance.Translate("Cancelar"),
             DefaultButton = Microsoft.UI.Xaml.Controls.ContentDialogButton.Primary,
             XamlRoot = xamlRoot
         };

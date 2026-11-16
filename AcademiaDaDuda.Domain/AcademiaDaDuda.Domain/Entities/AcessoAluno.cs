@@ -22,9 +22,6 @@ public class AcessoAluno : Entity, IAggregateRoot
         if (aluno == null)
             notifications.Add(new Notification("Aluno", "ALUNO_INVALIDO"));
 
-        if (dataHora.TimeOfDay < new TimeSpan(6, 0, 0) || dataHora.TimeOfDay > new TimeSpan(22, 0, 0))
-            notifications.Add(new Notification("DataHora", "DATA_HORA_INTERVALO_INVALIDO"));
-
         if (notifications.Count != 0)
             return Result<AcessoAluno>.Failure(notifications);
 

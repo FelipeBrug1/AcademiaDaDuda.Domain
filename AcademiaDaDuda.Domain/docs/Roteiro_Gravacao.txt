@@ -1,26 +1,19 @@
 ROTEIRO DE DEMONSTRAÇÃO — ACADEMIA DA DUDA
 
-Antes de gravar
-- Abra a solução a partir de um caminho sem acentos, por exemplo C:\workspace\AcademiaDaDuda.Domain.
-- Inicie o aplicativo no emulador Android ou em um aparelho conectado.
-- Use dados fictícios de teste, CPF válido ainda não cadastrado, e-mail de teste e uma foto da galeria.
+Preparação
+- Abra a solução a partir de um caminho sem acentos, como C:\workspace\AcademiaDaDuda.Domain.
+- Cadastre um logradouro e dados fictícios para um aluno sem matrícula, outro com matrícula ativa e um colaborador.
+- Use CPFs válidos ainda não cadastrados. Não use dados pessoais reais na gravação.
+- Inicie o aplicativo no Windows, emulador Android ou aparelho conectado e grave a tela.
 
-Colaborador
-1. Abra Colaboradores e toque em Novo colaborador.
-2. Preencha os dados obrigatórios, incluindo CPF, nascimento, telefone, e-mail, senha, data de admissão, tipo, vínculo e um CEP já cadastrado em Logradouros.
-3. Escolha uma foto pela galeria e salve o cadastro.
-4. Na lista, filtre por CPF e mostre o registro encontrado.
-5. Abra a edição, altere o nome para “Zé dos testes”, escolha outra foto da galeria e salve.
-6. Pesquise novamente pelo mesmo CPF e mostre o nome e a foto atualizados.
-7. Exclua o registro e confirme a exclusão.
+Fluxo obrigatório de controle de acesso
+1. No dashboard, mostre o logo da Academia da Duda com o nome completo do autor.
+2. Abra Controle de Acesso e selecione o modo Aluno.
+3. Escolha o aluno sem matrícula ativa e tente registrar a entrada. Mostre a mensagem de acesso negado.
+4. Escolha o aluno com matrícula ativa e registre a entrada. Mostre o nome completo, a confirmação, os dias restantes do plano e o registro na lista do dia.
+5. Sem trocar de aluno, registre a saída. Mostre o tempo de permanência e o novo registro na lista.
+6. Mude para Colaborador, escolha o colaborador e registre a entrada.
+7. Registre a saída do mesmo colaborador e mostre os dois horários no histórico do dia.
+8. Finalize retornando ao dashboard.
 
-Aluno
-8. Abra Alunos e toque em Novo aluno.
-9. Preencha os dados obrigatórios, incluindo CPF válido ainda não cadastrado, nascimento, telefone, e-mail, senha e um CEP já cadastrado em Logradouros.
-10. Escolha uma foto pela galeria e salve o cadastro.
-11. Na lista, filtre por CPF e mostre o registro encontrado.
-12. Abra a edição, altere o nome para “Zé dos testes”, escolha outra foto da galeria e salve.
-13. Pesquise novamente pelo mesmo CPF e mostre o nome e a foto atualizados.
-14. Exclua o registro e confirme a exclusão.
-
-Finalize mostrando o dashboard e os atalhos para as listas. Grave a tela do emulador ou aparelho durante os passos; este roteiro não é um vídeo gravado.
+O aplicativo registra cada evento com data e hora local. Alunos sem matrícula ativa não geram registro de entrada. A saída de uma pessoa que já está na academia permanece disponível para encerrar a visita.

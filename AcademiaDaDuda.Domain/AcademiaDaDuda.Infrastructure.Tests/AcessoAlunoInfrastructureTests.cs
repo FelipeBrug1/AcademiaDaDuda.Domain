@@ -47,7 +47,7 @@ public class AcessoAlunoInfrastructureTests : TestBase
     private async Task<AcessoAluno> CriarEInserirAcessoAsync(Aluno? aluno = null, DateTime? dataHora = null)
     {
         var targetAluno = aluno ?? await CriarEInserirAlunoAsync();
-        var horario = dataHora ?? DateTime.Today.AddHours(10); // Horário dentro da janela permitida (06:00 às 22:00)
+        var horario = dataHora ?? DateTime.Today.AddHours(10);
 
         var acessoResult = AcessoAluno.Criar(0, targetAluno, horario);
         if (acessoResult.IsFailure)

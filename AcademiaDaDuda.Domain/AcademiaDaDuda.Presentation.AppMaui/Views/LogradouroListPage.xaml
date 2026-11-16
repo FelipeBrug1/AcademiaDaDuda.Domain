@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage
+<ContentPage xmlns:loc="clr-namespace:AcademiaDaDuda.Presentation.AppMaui.Localization"
     x:Class="AcademiaDaDuda.Presentation.AppMaui.Views.LogradouroListPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:AcademiaDaDuda.Presentation.AppMaui.ViewModels"
     xmlns:dto="clr-namespace:AcademiaDaDuda.Application.DTOs;assembly=AcademiaDaDuda.Application"
     x:DataType="vm:LogradouroListViewModel"
-    Title="Logradouros"
+    Title="{loc:Translate Key='MenuLogradouros'}"
     BackgroundColor="{DynamicResource PageBackgroundColor}">
     <Grid Padding="22" RowDefinitions="Auto,Auto,*" RowSpacing="16">
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
             <VerticalStackLayout Spacing="3">
-                <Label Text="Logradouros" FontSize="27" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
-                <Label Text="{Binding Logradouros.Count, StringFormat='{0:N0} endereços cadastrados'}"
+                <Label Text="{loc:Translate Key='MenuLogradouros'}" FontSize="27" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                <Label Text="{loc:TranslateFormat Key='{0:N0} endereços cadastrados', Value={Binding Logradouros.Count}}"
                        FontSize="13" TextColor="{DynamicResource SecondaryTextColor}" />
             </VerticalStackLayout>
-            <Button Grid.Column="1" Text="＋ Novo" Command="{Binding AddLogradouroCommand}"
+            <Button Grid.Column="1" Text="{loc:Translate Key='＋ Novo'}" Command="{Binding AddLogradouroCommand}"
                     BackgroundColor="{DynamicResource BrandColor}" TextColor="White" FontAttributes="Bold"
                     VerticalOptions="Center" CornerRadius="14" />
         </Grid>
@@ -23,12 +23,12 @@
         <Border Grid.Row="1" Padding="10" BackgroundColor="{DynamicResource SurfaceColor}"
                 Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 16">
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
-                <Picker Title="Campo" WidthRequest="112" ItemsSource="{Binding TiposDeBusca}"
-                        SelectedItem="{Binding TipoDeBusca}" FontSize="13" TextColor="{DynamicResource PrimaryTextColor}" />
-                <Entry Grid.Column="1" Text="{Binding TextoBusca}" Placeholder="Buscar"
+                <Picker Title="{loc:Translate Key='Campo'}" WidthRequest="112" ItemsSource="{Binding TiposDeBusca}"
+                        ItemDisplayBinding="{Binding DisplayName}" SelectedItem="{Binding TipoDeBusca}" FontSize="13" TextColor="{DynamicResource PrimaryTextColor}" />
+                <Entry Grid.Column="1" Text="{Binding TextoBusca}" Placeholder="{loc:Translate Key='Buscar'}"
                        ReturnType="Search" ReturnCommand="{Binding SearchLogradourosCommand}"
                        ClearButtonVisibility="WhileEditing" VerticalOptions="Center" />
-                <Button Grid.Column="2" Text="⌕  Buscar" Command="{Binding SearchLogradourosCommand}"
+                <Button Grid.Column="2" Text="{loc:Translate Key='⌕  Buscar'}" Command="{Binding SearchLogradourosCommand}"
                         BackgroundColor="{DynamicResource BrandSoftColor}" TextColor="{DynamicResource BrandDarkColor}" CornerRadius="12" Padding="12,8" />
             </Grid>
         </Border>
@@ -37,9 +37,9 @@
             <CollectionView ItemsSource="{Binding Logradouros}" SelectionMode="None">
                 <CollectionView.EmptyView>
                     <VerticalStackLayout Padding="25" Spacing="10" VerticalOptions="Center">
-                        <Label Text="Nenhum logradouro encontrado" FontSize="18" FontAttributes="Bold"
+                        <Label Text="{loc:Translate Key='Nenhum logradouro encontrado'}" FontSize="18" FontAttributes="Bold"
                                TextColor="{DynamicResource PrimaryTextColor}" HorizontalTextAlignment="Center" />
-                        <Label Text="Cadastre um endereço ou altere os filtros da busca."
+                        <Label Text="{loc:Translate Key='Cadastre um endereço ou altere os filtros da busca.'}"
                                FontSize="14" TextColor="{DynamicResource SecondaryTextColor}" HorizontalTextAlignment="Center" />
                     </VerticalStackLayout>
                 </CollectionView.EmptyView>
@@ -50,15 +50,15 @@
                             <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto"
                                   ColumnSpacing="12" RowSpacing="5">
                                 <Label Text="{Binding Nome}" FontSize="17" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
-                                <Label Grid.Row="1" Text="{Binding Cep, StringFormat='CEP {0}'}"
+                                <Label Grid.Row="1" Text="{loc:TranslateFormat Key='CEP {0}', Value={Binding Cep}}"
                                        FontSize="13" TextColor="{DynamicResource BrandColor}" />
                                 <Label Grid.Row="2" Grid.ColumnSpan="2"
-                                       Text="{Binding Cidade, StringFormat='{0}'}"
+                                       Text="{Binding Cidade}"
                                        FontSize="13" TextColor="{DynamicResource SecondaryTextColor}" />
                                 <HorizontalStackLayout Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Spacing="6">
-                                    <Button Text="✎  Editar" Clicked="OnEditLogradouroClicked" BackgroundColor="{DynamicResource BrandSoftColor}"
+                                    <Button Text="{loc:Translate Key='✎  Editar'}" Clicked="OnEditLogradouroClicked" BackgroundColor="{DynamicResource BrandSoftColor}"
                                             TextColor="{DynamicResource BrandDarkColor}" CornerRadius="10" Padding="10,6" />
-                                    <Button Text="×  Excluir" Clicked="OnDeleteLogradouroClicked" BackgroundColor="{DynamicResource DangerSoftColor}"
+                                    <Button Text="{loc:Translate Key='×  Excluir'}" Clicked="OnDeleteLogradouroClicked" BackgroundColor="{DynamicResource DangerSoftColor}"
                                             TextColor="{DynamicResource DangerColor}" CornerRadius="10" Padding="10,6" />
                                 </HorizontalStackLayout>
                             </Grid>

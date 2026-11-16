@@ -29,6 +29,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\AcademiaDaDuda.Domain\AcademiaDaDuda.Domain.csproj" />
+		<ProjectReference Include="..\AcademiaDaDuda.Application\AcademiaDaDuda.Application.csproj" />
 		<ProjectReference Include="..\AcademiaDaDuda.Infrastructure\AcademiaDaDuda.Infrastructure.csproj" />
 	</ItemGroup>
 

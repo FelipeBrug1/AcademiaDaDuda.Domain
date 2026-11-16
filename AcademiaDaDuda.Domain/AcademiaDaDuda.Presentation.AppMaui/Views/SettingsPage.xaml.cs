@@ -30,4 +30,12 @@ public partial class SettingsPage : ContentPage
 
         viewModel.ApplySelectedTheme();
     }
+
+    private void OnLanguageSelectedIndexChanged(object? sender, EventArgs e)
+    {
+        if (_isLoadingSettings || BindingContext is not SettingsViewModel viewModel || LanguagePicker.SelectedIndex < 0)
+            return;
+
+        viewModel.ApplySelectedLanguage();
+    }
 }

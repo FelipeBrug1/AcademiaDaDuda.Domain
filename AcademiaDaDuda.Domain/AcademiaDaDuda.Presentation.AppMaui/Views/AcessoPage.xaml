@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:loc="clr-namespace:AcademiaDaDuda.Presentation.AppMaui.Localization"
+             xmlns:vm="clr-namespace:AcademiaDaDuda.Presentation.AppMaui.ViewModels"
+             x:Class="AcademiaDaDuda.Presentation.AppMaui.Views.AcessoPage"
+             x:DataType="vm:AcessoViewModel"
+             Title="{loc:Translate Key='MenuAcesso'}"
+             BackgroundColor="{DynamicResource PageBackgroundColor}">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="16">
+            <VerticalStackLayout Spacing="4">
+                <Label Text="{loc:Translate Key='Controle de Acesso'}" FontSize="28" FontAttributes="Bold"
+                       TextColor="{DynamicResource PrimaryTextColor}" />
+                <Label Text="{loc:Translate Key='Registre a entrada e a saída de alunos e colaboradores'}"
+                       FontSize="14" TextColor="{DynamicResource SecondaryTextColor}" />
+            </VerticalStackLayout>
+
+            <Border Padding="18" BackgroundColor="{DynamicResource SurfaceColor}"
+                    Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="{loc:Translate Key='Selecione o modo de acesso'}" FontSize="17" FontAttributes="Bold"
+                           TextColor="{DynamicResource PrimaryTextColor}" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <Button Text="{loc:Translate Key='Aluno'}" Command="{Binding SelecionarAlunosCommand}"
+                                BackgroundColor="{Binding CorModoAluno}" TextColor="White" CornerRadius="14" />
+                        <Button Grid.Column="1" Text="{loc:Translate Key='Colaborador'}" Command="{Binding SelecionarColaboradoresCommand}"
+                                BackgroundColor="{Binding CorModoColaborador}" TextColor="White" CornerRadius="14" />
+                    </Grid>
+                    <Label Text="{Binding EstadoModoAtual}" FontSize="12" HorizontalTextAlignment="Center"
+                           TextColor="{DynamicResource BrandColor}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Padding="18" BackgroundColor="{DynamicResource SurfaceColor}"
+                    Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{loc:Translate Key='Localizar pessoa'}" FontSize="18" FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" TextColor="{DynamicResource PrimaryTextColor}" />
+                    <SearchBar Placeholder="{Binding PlaceholderBusca}" Text="{Binding TermoBusca}"
+                               BackgroundColor="{DynamicResource SurfaceColor}" />
+                    <Label Text="{Binding PlaceholderPessoa}" FontSize="12" FontAttributes="Bold"
+                           TextColor="{DynamicResource PrimaryTextColor}" />
+                    <Picker ItemsSource="{Binding PessoasDisponiveis}"
+                            ItemDisplayBinding="{Binding NomeCpf}"
+                            SelectedItem="{Binding PessoaSelecionada, Mode=TwoWay}"
+                            Title="{Binding PlaceholderPessoa}"
+                            TextColor="{DynamicResource PrimaryTextColor}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Padding="18" BackgroundColor="{DynamicResource SurfaceColor}"
+                    Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="{loc:Translate Key='Identificação e liberação'}" FontSize="18" FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" TextColor="{DynamicResource PrimaryTextColor}" />
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" IsVisible="{Binding TemPessoaSelecionada}">
+                        <Border WidthRequest="52" HeightRequest="52" BackgroundColor="{DynamicResource BrandColor}"
+                                StrokeThickness="0" StrokeShape="RoundRectangle 26" VerticalOptions="Center">
+                            <Label Text="&#xe7fd;" FontFamily="MaterialIcons" FontSize="28" TextColor="White"
+                                   HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="3">
+                            <Label Text="{Binding PessoaSelecionada.Nome}" FontSize="15" FontAttributes="Bold"
+                                   TextColor="{DynamicResource PrimaryTextColor}" />
+                            <Label Text="{loc:TranslateFormat Key='ID: {0}', Value={Binding PessoaSelecionada.Id}}" FontSize="12"
+                                   TextColor="{DynamicResource SecondaryTextColor}" />
+                            <Label Text="{Binding PessoaSelecionada.Cpf, StringFormat='CPF: {0}'}" FontSize="12"
+                                   TextColor="{DynamicResource SecondaryTextColor}" />
+                            <Label Text="{Binding SituacaoAtual}" FontSize="13" FontAttributes="Bold"
+                                   TextColor="{DynamicResource BrandColor}" />
+                            <Label Text="{Binding DetalheSituacao}" FontSize="12"
+                                   TextColor="{DynamicResource SecondaryTextColor}" />
+                        </VerticalStackLayout>
+                    </Grid>
+                    <Label Text="{Binding SituacaoAtual}" IsVisible="{Binding SemPessoaSelecionada}"
+                           TextColor="{DynamicResource SecondaryTextColor}" HorizontalTextAlignment="Center" />
+                    <Button Text="{Binding TextoAcaoAcesso}" Command="{Binding RegistrarAcessoCommand}"
+                            IsEnabled="{Binding TemPessoaSelecionada}"
+                            BackgroundColor="{DynamicResource BrandColor}" TextColor="White" FontAttributes="Bold"
+                            HeightRequest="52" CornerRadius="14" />
+                    <Border Padding="12" BackgroundColor="{Binding CorResultado}" StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12" IsVisible="{Binding TemMensagemResultado}">
+                        <Label Text="{Binding MensagemResultado}" FontSize="13" TextColor="White" />
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Padding="18" BackgroundColor="{DynamicResource SurfaceColor}"
+                    Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 18">
+                <VerticalStackLayout Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="{loc:Translate Key='Acessos registrados hoje'}" FontSize="18" FontAttributes="Bold"
+                               TextColor="{DynamicResource PrimaryTextColor}" VerticalTextAlignment="Center" />
+                        <Button Grid.Column="1" Text="{loc:Translate Key='Atualizar'}" Command="{Binding CarregarCommand}"
+                                BackgroundColor="{DynamicResource BrandColor}" TextColor="White" CornerRadius="10" />
+                    </Grid>
+                    <Label Text="{loc:Translate Key='Ainda não há acessos registrados hoje'}" IsVisible="{Binding SemEventosHoje}"
+                           TextColor="{DynamicResource SecondaryTextColor}" HorizontalTextAlignment="Center" />
+                    <CollectionView ItemsSource="{Binding EventosHoje}" HeightRequest="320" SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:AcessoEventoLinha">
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Padding="0,8">
+                                    <Border WidthRequest="36" HeightRequest="36" BackgroundColor="{DynamicResource BrandColor}"
+                                            StrokeThickness="0" StrokeShape="RoundRectangle 18" VerticalOptions="Center">
+                                        <Label Text="&#xe192;" FontFamily="MaterialIcons" FontSize="18" TextColor="White"
+                                               HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="{Binding Nome}" FontSize="13" FontAttributes="Bold"
+                                               TextColor="{DynamicResource PrimaryTextColor}" />
+                                        <Label Text="{Binding Descricao}" FontSize="11"
+                                               TextColor="{DynamicResource SecondaryTextColor}" />
+                                        <Label Text="{Binding Cpf}" FontSize="10" TextColor="{DynamicResource SecondaryTextColor}" />
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="2" Text="{Binding Horario}" FontSize="11" VerticalTextAlignment="Center"
+                                           TextColor="{DynamicResource SecondaryTextColor}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                                       Color="{DynamicResource BrandColor}" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

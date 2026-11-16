@@ -5,6 +5,8 @@ using AcademiaDaDuda.Presentation.AppMaui.Configuration;
 using AcademiaDaDuda.Presentation.AppMaui.Converters;
 using AcademiaDaDuda.Presentation.AppMaui.Services;
 using CommunityToolkit.Mvvm.Input;
+using System.Collections.ObjectModel;
+using AcademiaDaDuda.Presentation.AppMaui.Localization;
 using LogradouroDto = AcademiaDaDuda.Application.DTOs.LogradouroDto;
 
 namespace AcademiaDaDuda.Presentation.AppMaui.ViewModels;
@@ -22,8 +24,8 @@ public partial class ColaboradorViewModel : BaseViewModel
     private bool _initialized;
     private string _confirmarSenha = string.Empty;
 
-    public IEnumerable<AppColaboradorTipo> ColaboradorTipos { get; } = Enum.GetValues<AppColaboradorTipo>();
-    public IEnumerable<AppColaboradorVinculo> ColaboradorVinculos { get; } = Enum.GetValues<AppColaboradorVinculo>();
+    public ObservableCollection<AppColaboradorTipo> ColaboradorTipos { get; } = new(Enum.GetValues<AppColaboradorTipo>());
+    public ObservableCollection<AppColaboradorVinculo> ColaboradorVinculos { get; } = new(Enum.GetValues<AppColaboradorVinculo>());
 
     public ColaboradorDto Colaborador
     {
@@ -56,7 +58,17 @@ public partial class ColaboradorViewModel : BaseViewModel
         }
     }
 
-    public string SaveButtonText => IsEditMode ? "Salvar alterações" : "Cadastrar colaborador";
+    public string SaveButtonText => LocalizationManager.Instance.Translate(IsEditMode ? "Salvar alterações" : "Cadastrar colaborador");
+
+    protected override void OnCultureChanged()
+    {
+        ColaboradorTipos.Clear();
+        foreach (var tipo in Enum.GetValues<AppColaboradorTipo>())
+            ColaboradorTipos.Add(tipo);
+        ColaboradorVinculos.Clear();
+        foreach (var vinculo in Enum.GetValues<AppColaboradorVinculo>())
+            ColaboradorVinculos.Add(vinculo);
+    }
 
     public string ConfirmarSenha
     {
@@ -75,7 +87,7 @@ public partial class ColaboradorViewModel : BaseViewModel
         _colaboradorService = colaboradorService;
         _logradouroService = logradouroService;
         _databaseSettingsStartup = databaseSettingsStartup;
-        Title = "Novo colaborador";
+        SetTitle("Novo colaborador");
     }
 
     public async Task InitializeAsync()
@@ -88,13 +100,13 @@ public partial class ColaboradorViewModel : BaseViewModel
         if (ColaboradorId > 0)
         {
             IsEditMode = true;
-            Title = "Editar colaborador";
+            SetTitle("Editar colaborador");
             await LoadColaboradorAsync();
             return;
         }
 
         IsEditMode = false;
-        Title = "Novo colaborador";
+        SetTitle("Novo colaborador");
         Colaborador = NewColaborador();
         NotifyAddressState();
     }
@@ -116,7 +128,7 @@ public partial class ColaboradorViewModel : BaseViewModel
             var existing = await _colaboradorService.ObterPorIdAsync(ColaboradorId, cancellation.Token);
             if (existing is null)
             {
-                await Shell.Current.DisplayAlertAsync("Não encontrado", "O colaborador solicitado não existe mais.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Não encontrado", "O colaborador solicitado não existe mais.", "OK");
                 await Shell.Current.GoToAsync("..");
                 return;
             }
@@ -129,11 +141,11 @@ public partial class ColaboradorViewModel : BaseViewModel
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "Não foi possível carregar os dados do colaborador a tempo.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "Não foi possível carregar os dados do colaborador a tempo.", "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro ao carregar", $"Não foi possível carregar o colaborador. {exception.Message}", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro ao carregar", global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizationManager.Instance.Format("Não foi possível carregar o colaborador. {0}", exception.Message), "OK");
         }
         finally
         {
@@ -147,7 +159,7 @@ public partial class ColaboradorViewModel : BaseViewModel
         var cpf = PessoaFormValidation.DigitsOnly(Colaborador.Cpf);
         if (cpf.Length != 11)
         {
-            await Shell.Current.DisplayAlertAsync("CPF inválido", "Informe os 11 dígitos do CPF para consultar.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("CPF inválido", "Informe os 11 dígitos do CPF para consultar.", "OK");
             return;
         }
 
@@ -159,14 +171,14 @@ public partial class ColaboradorViewModel : BaseViewModel
             var found = await _colaboradorService.ObterPorCpfAsync(cpf, cancellation.Token);
             if (found is null)
             {
-                await Shell.Current.DisplayAlertAsync("Colaborador não encontrado", "Nenhum cadastro foi localizado com esse CPF.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Colaborador não encontrado", "Nenhum cadastro foi localizado com esse CPF.", "OK");
                 return;
             }
 
             var fullRecord = await _colaboradorService.ObterPorIdAsync(found.Id, cancellation.Token);
             if (fullRecord is null)
             {
-                await Shell.Current.DisplayAlertAsync("Colaborador não encontrado", "Não foi possível carregar os dados completos desse cadastro.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Colaborador não encontrado", "Não foi possível carregar os dados completos desse cadastro.", "OK");
                 return;
             }
 
@@ -174,19 +186,19 @@ public partial class ColaboradorViewModel : BaseViewModel
             fullRecord.Senha = string.Empty;
             ColaboradorId = fullRecord.Id;
             IsEditMode = true;
-            Title = "Editar colaborador";
+            SetTitle("Editar colaborador");
             Colaborador = fullRecord;
             ConfirmarSenha = string.Empty;
             NotifyAddressState();
-            await Shell.Current.DisplayAlertAsync("Cadastro localizado", "Os dados foram carregados para edição.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Cadastro localizado", "Os dados foram carregados para edição.", "OK");
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "A busca por CPF demorou mais que o esperado.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "A busca por CPF demorou mais que o esperado.", "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro na busca", exception.Message, "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro na busca", exception.Message, "OK");
         }
         finally
         {
@@ -200,7 +212,7 @@ public partial class ColaboradorViewModel : BaseViewModel
         var cep = PessoaFormValidation.DigitsOnly(Colaborador.Endereco?.Cep);
         if (cep.Length != 8)
         {
-            await Shell.Current.DisplayAlertAsync("CEP inválido", "Informe os 8 dígitos do CEP para consultar.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("CEP inválido", "Informe os 8 dígitos do CEP para consultar.", "OK");
             return;
         }
 
@@ -212,22 +224,22 @@ public partial class ColaboradorViewModel : BaseViewModel
             var address = await _logradouroService.ObterPorCepAsync(cep, cancellation.Token);
             if (address is null)
             {
-                await Shell.Current.DisplayAlertAsync("Logradouro não encontrado", "Cadastre esse CEP na opção Logradouros antes de salvar o colaborador.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Logradouro não encontrado", "Cadastre esse CEP na opção Logradouros antes de salvar o colaborador.", "OK");
                 return;
             }
 
             Colaborador.Endereco = address;
             OnPropertyChanged(nameof(Colaborador));
             NotifyAddressState();
-            await Shell.Current.DisplayAlertAsync("CEP encontrado", "O endereço cadastrado foi vinculado ao colaborador.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("CEP encontrado", "O endereço cadastrado foi vinculado ao colaborador.", "OK");
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "A consulta do CEP demorou mais que o esperado.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "A consulta do CEP demorou mais que o esperado.", "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro na consulta", exception.Message, "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro na consulta", exception.Message, "OK");
         }
         finally
         {
@@ -240,12 +252,12 @@ public partial class ColaboradorViewModel : BaseViewModel
     {
         try
         {
-            var choice = await Shell.Current.DisplayActionSheetAsync("Foto do colaborador", "Cancelar", null, "Galeria", "Câmera");
+            var choice = await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayActionSheetAsync("Foto do colaborador", "Cancelar", null, "Galeria", "Câmera");
             FileResult? photo = choice switch
             {
                 "Galeria" => await FilePicker.Default.PickAsync(new PickOptions
                 {
-                    PickerTitle = "Selecione uma foto",
+                    PickerTitle = global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizationManager.Instance.Translate("Selecione uma foto"),
                     FileTypes = FilePickerFileType.Images
                 }),
                 "Câmera" => await PhotoCaptureService.CapturePhotoAsync(),
@@ -264,7 +276,7 @@ public partial class ColaboradorViewModel : BaseViewModel
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro ao selecionar foto", exception.Message, "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro ao selecionar foto", exception.Message, "OK");
         }
     }
 
@@ -283,7 +295,7 @@ public partial class ColaboradorViewModel : BaseViewModel
 
         if (errors.Count > 0)
         {
-            await Shell.Current.DisplayAlertAsync("Revise os dados", string.Join(Environment.NewLine, errors.Select(error => $"• {error}")), "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Revise os dados", string.Join(Environment.NewLine, errors.Select(error => $"• {error}")), "OK");
             return;
         }
 
@@ -297,7 +309,7 @@ public partial class ColaboradorViewModel : BaseViewModel
             var address = await _logradouroService.ObterPorCepAsync(cep, cancellation.Token);
             if (address is null)
             {
-                await Shell.Current.DisplayAlertAsync("Endereço obrigatório", "O CEP informado não está cadastrado em Logradouros. Cadastre-o antes de salvar o colaborador.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Endereço obrigatório", "O CEP informado não está cadastrado em Logradouros. Cadastre-o antes de salvar o colaborador.", "OK");
                 return;
             }
 
@@ -314,23 +326,23 @@ public partial class ColaboradorViewModel : BaseViewModel
             if (IsEditMode)
             {
                 await _colaboradorService.AtualizarAsync(Colaborador, cancellation.Token);
-                await Shell.Current.DisplayAlertAsync("Concluído", "Colaborador atualizado com sucesso.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Concluído", "Colaborador atualizado com sucesso.", "OK");
             }
             else
             {
                 await _colaboradorService.AdicionarAsync(Colaborador, cancellation.Token);
-                await Shell.Current.DisplayAlertAsync("Concluído", "Colaborador cadastrado com sucesso.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Concluído", "Colaborador cadastrado com sucesso.", "OK");
             }
 
             await Shell.Current.GoToAsync("..");
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "Não foi possível salvar o colaborador a tempo.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "Não foi possível salvar o colaborador a tempo.", "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro ao salvar", exception.Message, "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro ao salvar", exception.Message, "OK");
         }
         finally
         {

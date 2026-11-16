@@ -4,6 +4,7 @@ using AcademiaDaDuda.Presentation.AppMaui.Messages;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Maui.Storage;
+using AcademiaDaDuda.Presentation.AppMaui.Localization;
 
 namespace AcademiaDaDuda.Presentation.AppMaui.ViewModels;
 
@@ -19,10 +20,17 @@ public partial class SettingsViewModel : BaseViewModel
     private string _username = string.Empty;
     private string _password = string.Empty;
     private bool _trustServerCertificate = true;
-    private string _selectedTheme = "Sistema";
+    private LocalizedOption _selectedTheme = null!;
+    private LanguageOption _selectedLanguage = null!;
 
     public IReadOnlyList<string> DatabaseTypes { get; } = ["SQLite", "MySQL", "SQL Server"];
-    public IReadOnlyList<string> Themes { get; } = ["Sistema", "Claro", "Escuro"];
+    public IReadOnlyList<LocalizedOption> Themes { get; } = [new("Sistema"), new("Claro"), new("Escuro")];
+    public IReadOnlyList<LanguageOption> Languages { get; } =
+    [
+        new("pt-BR", "🇧🇷 Português (Brasil)"),
+        new("en-US", "🇺🇸 English (United States)"),
+        new("es-ES", "🇪🇸 Español (España)")
+    ];
 
     public string SelectedDatabaseType
     {
@@ -46,7 +54,8 @@ public partial class SettingsViewModel : BaseViewModel
     public string Username { get => _username; set => SetProperty(ref _username, value); }
     public string Password { get => _password; set => SetProperty(ref _password, value); }
     public bool TrustServerCertificate { get => _trustServerCertificate; set => SetProperty(ref _trustServerCertificate, value); }
-    public string SelectedTheme { get => _selectedTheme; set => SetProperty(ref _selectedTheme, value); }
+    public LocalizedOption SelectedTheme { get => _selectedTheme; set => SetProperty(ref _selectedTheme, value); }
+    public LanguageOption SelectedLanguage { get => _selectedLanguage; set => SetProperty(ref _selectedLanguage, value); }
 
     public bool IsSqlite => SelectedDatabaseType == "SQLite";
     public bool IsServerDatabase => !IsSqlite;
@@ -54,7 +63,7 @@ public partial class SettingsViewModel : BaseViewModel
 
     public void ApplySelectedTheme()
     {
-        var theme = SelectedTheme switch
+        var theme = SelectedTheme.Key switch
         {
             "Claro" => AppTheme.Light,
             "Escuro" => AppTheme.Dark,
@@ -65,10 +74,14 @@ public partial class SettingsViewModel : BaseViewModel
         WeakReferenceMessenger.Default.Send(new TemaPreferenciasAtualizadasMessage(theme));
     }
 
+    public void ApplySelectedLanguage() => LocalizationManager.Instance.SetCulture(SelectedLanguage.CultureName);
+
     public SettingsViewModel(DatabaseSettingsStartup databaseSettingsStartup)
     {
         _databaseSettingsStartup = databaseSettingsStartup;
-        Title = "Configurações";
+        SelectedTheme = Themes[0];
+        SelectedLanguage = Languages[0];
+        SetTitle("Configurações");
     }
 
     [RelayCommand]
@@ -99,16 +112,19 @@ public partial class SettingsViewModel : BaseViewModel
             TrustServerCertificate = Preferences.Get(DatabaseSettingsStartup.TrustCertificateKey, true);
             Password = await SecureStorage.Default.GetAsync(DatabaseSettingsStartup.PasswordKey) ?? string.Empty;
 
-            SelectedTheme = Preferences.Get(DatabaseSettingsStartup.ThemeKey, "System") switch
+            var selectedThemeKey = Preferences.Get(DatabaseSettingsStartup.ThemeKey, "System") switch
             {
                 "Light" => "Claro",
                 "Dark" => "Escuro",
                 _ => "Sistema"
             };
+            SelectedTheme = Themes.First(option => option.Key == selectedThemeKey);
+            var selectedCulture = Preferences.Get(LocalizationManager.LanguagePreferenceKey, "pt-BR");
+            SelectedLanguage = Languages.FirstOrDefault(option => option.CultureName == selectedCulture) ?? Languages[0];
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Configurações", $"Não foi possível carregar as preferências. {exception.Message}", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Configurações", global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizationManager.Instance.Format("Não foi possível carregar as preferências. {0}", exception.Message), "OK");
         }
         finally
         {
@@ -136,7 +152,7 @@ public partial class SettingsViewModel : BaseViewModel
             {
                 if (string.IsNullOrWhiteSpace(SqlitePath))
                 {
-                    await Shell.Current.DisplayAlertAsync("Caminho inválido", "Informe o caminho do arquivo do banco SQLite.", "OK");
+                    await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Caminho inválido", "Informe o caminho do arquivo do banco SQLite.", "OK");
                     return;
                 }
 
@@ -146,20 +162,20 @@ public partial class SettingsViewModel : BaseViewModel
             {
                 if (string.IsNullOrWhiteSpace(Server) || string.IsNullOrWhiteSpace(Database) || string.IsNullOrWhiteSpace(Username))
                 {
-                    await Shell.Current.DisplayAlertAsync("Dados incompletos", "Informe servidor, banco de dados e usuário.", "OK");
+                    await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Dados incompletos", "Informe servidor, banco de dados e usuário.", "OK");
                     return;
                 }
 
                 if (!int.TryParse(Port, out var parsedPort) || parsedPort is < 1 or > 65535)
                 {
-                    await Shell.Current.DisplayAlertAsync("Porta inválida", "Informe uma porta entre 1 e 65535.", "OK");
+                    await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Porta inválida", "Informe uma porta entre 1 e 65535.", "OK");
                     return;
                 }
 
                 Port = parsedPort.ToString();
             }
 
-            var selectedTheme = SelectedTheme switch
+            var selectedTheme = SelectedTheme.Key switch
             {
                 "Claro" => AppTheme.Light,
                 "Escuro" => AppTheme.Dark,
@@ -192,11 +208,11 @@ public partial class SettingsViewModel : BaseViewModel
             WeakReferenceMessenger.Default.Send(new BancoPreferenciasAtualizadasMessage(new DatabaseSettings(type, connectionString)));
             WeakReferenceMessenger.Default.Send(new TemaPreferenciasAtualizadasMessage(selectedTheme));
 
-            await Shell.Current.DisplayAlertAsync("Configurações salvas", "As preferências foram aplicadas.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Configurações salvas", "As preferências foram aplicadas.", "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Falha ao salvar", $"Não foi possível salvar as configurações. {exception.Message}", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Falha ao salvar", global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizationManager.Instance.Format("Não foi possível salvar as configurações. {0}", exception.Message), "OK");
         }
         finally
         {

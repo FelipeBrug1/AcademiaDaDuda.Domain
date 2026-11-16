@@ -14,4 +14,6 @@ public sealed class RestricaoSelectable : ObservableObject
         get => _isSelected;
         set => SetProperty(ref _isSelected, value);
     }
+
+    public void RefreshLocalizedValue() => OnPropertyChanged(nameof(Value));
 }

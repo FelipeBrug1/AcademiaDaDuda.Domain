@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage
+<ContentPage xmlns:loc="clr-namespace:AcademiaDaDuda.Presentation.AppMaui.Localization"
     x:Class="AcademiaDaDuda.Presentation.AppMaui.Views.MatriculaListPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
@@ -7,7 +7,7 @@
     xmlns:dto="clr-namespace:AcademiaDaDuda.Application.DTOs;assembly=AcademiaDaDuda.Application"
     xmlns:converters="clr-namespace:AcademiaDaDuda.Presentation.AppMaui.Converters"
     x:DataType="vm:MatriculaListViewModel"
-    Title="Matrículas"
+    Title="{loc:Translate Key='Matrículas'}"
     BackgroundColor="{DynamicResource PageBackgroundColor}">
     <ContentPage.Resources>
         <converters:FotoToImageSourceConverter x:Key="FotoToImageSourceConverter" />
@@ -26,10 +26,10 @@
 
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
             <VerticalStackLayout Spacing="3" VerticalOptions="Center">
-                <Label Text="Matrículas" FontSize="27" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
-                <Label Text="{Binding Matriculas.Count, StringFormat='{0:N0} cadastros'}" FontSize="13" TextColor="{DynamicResource SecondaryTextColor}" />
+                <Label Text="{loc:Translate Key='Matrículas'}" FontSize="27" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                <Label Text="{loc:TranslateFormat Key='{0:N0} cadastros', Value={Binding Matriculas.Count}}" FontSize="13" TextColor="{DynamicResource SecondaryTextColor}" />
             </VerticalStackLayout>
-            <Button Grid.Column="1" Text="＋ Nova matrícula" Command="{Binding AddMatriculaCommand}"
+            <Button Grid.Column="1" Text="{loc:Translate Key='＋ Nova matrícula'}" Command="{Binding AddMatriculaCommand}"
                     BackgroundColor="{DynamicResource BrandColor}" TextColor="White" FontAttributes="Bold"
                     VerticalOptions="Center" CornerRadius="14" />
         </Grid>
@@ -37,15 +37,15 @@
         <Border Grid.Row="1" Padding="10" BackgroundColor="{DynamicResource SurfaceColor}"
                 Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 16">
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
-                <Picker Title="Campo" WidthRequest="145" ItemsSource="{Binding FilterTypes}"
-                        SelectedItem="{Binding SelectedFilterType}" FontSize="13"
+                <Picker Title="{loc:Translate Key='Campo'}" WidthRequest="145" ItemsSource="{Binding FilterTypes}"
+                        ItemDisplayBinding="{Binding DisplayName}" SelectedItem="{Binding SelectedFilterType}" FontSize="13"
                         TextColor="{DynamicResource PrimaryTextColor}" />
-                <Entry Grid.Column="1" Text="{Binding SearchText}" Placeholder="Digite o valor da busca"
+                <Entry Grid.Column="1" Text="{Binding SearchText}" Placeholder="{loc:Translate Key='Digite o valor da busca'}"
                        ReturnType="Search" ReturnCommand="{Binding SearchMatriculasCommand}"
                        ClearButtonVisibility="WhileEditing" VerticalOptions="Center" />
-                <Button Grid.Column="2" Text="Buscar" Command="{Binding SearchMatriculasCommand}"
+                <Button Grid.Column="2" Text="{loc:Translate Key='Buscar'}" Command="{Binding SearchMatriculasCommand}"
                         BackgroundColor="{DynamicResource BrandSoftColor}" TextColor="{DynamicResource BrandDarkColor}"
-                        CornerRadius="12" Padding="14,8" SemanticProperties.Hint="Buscar matrículas" />
+                        CornerRadius="12" Padding="14,8" SemanticProperties.Hint="{loc:Translate Key='Buscar matrículas'}" />
             </Grid>
         </Border>
 
@@ -54,11 +54,11 @@
                 <CollectionView ItemsSource="{Binding Matriculas}" SelectionMode="None" Margin="2">
                     <CollectionView.EmptyView>
                         <VerticalStackLayout Padding="25" Spacing="10" VerticalOptions="Center">
-                            <Label Text="Nenhuma matrícula encontrada" FontSize="18" FontAttributes="Bold"
+                            <Label Text="{loc:Translate Key='Nenhuma matrícula encontrada'}" FontSize="18" FontAttributes="Bold"
                                    TextColor="{DynamicResource PrimaryTextColor}" HorizontalTextAlignment="Center" />
-                            <Label Text="As matrículas cadastradas aparecerão aqui. Você pode buscar por aluno, plano, objetivo ou identificador."
+                            <Label Text="{loc:Translate Key='As matrículas cadastradas aparecerão aqui. Você pode buscar por aluno, plano, objetivo ou identificador.'}"
                                    FontSize="14" TextColor="{DynamicResource SecondaryTextColor}" HorizontalTextAlignment="Center" />
-                            <Button Text="Criar matrícula" Command="{Binding AddMatriculaCommand}"
+                            <Button Text="{loc:Translate Key='Criar matrícula'}" Command="{Binding AddMatriculaCommand}"
                                     BackgroundColor="{DynamicResource BrandColor}" TextColor="White" CornerRadius="14"
                                     HorizontalOptions="Center" />
                         </VerticalStackLayout>
@@ -84,27 +84,27 @@
                                                        FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource BrandColor}"
                                                        VerticalOptions="Center" />
                                             </Grid>
-                                            <Label Text="{Binding AlunoMatricula.Cpf, StringFormat='CPF: {0}'}" FontSize="12"
+                                            <Label Text="{loc:TranslateFormat Key='CPF: {0}', Value={Binding AlunoMatricula.Cpf}}" FontSize="12"
                                                    TextColor="{DynamicResource SecondaryTextColor}" />
-                                            <Label Text="{Binding AlunoMatricula.DataNascimento, StringFormat='Nascimento: {0:dd/MM/yyyy}'}" FontSize="12"
+                                            <Label Text="{loc:TranslateFormat Key='Nascimento: {0:d}', Value={Binding AlunoMatricula.DataNascimento}}" FontSize="12"
                                                    TextColor="{DynamicResource SecondaryTextColor}" />
                                         </VerticalStackLayout>
                                     </Grid>
-                                    <Label Text="{Binding DataInicio, StringFormat='Início: {0:dd/MM/yyyy}'}" FontSize="12"
+                                    <Label Text="{loc:TranslateFormat Key='Início: {0:d}', Value={Binding DataInicio}}" FontSize="12"
                                            TextColor="{DynamicResource SecondaryTextColor}" />
-                                    <Label Text="{Binding DataFim, StringFormat='Término: {0:dd/MM/yyyy}'}" FontSize="12"
+                                    <Label Text="{loc:TranslateFormat Key='Término: {0:d}', Value={Binding DataFim}}" FontSize="12"
                                            TextColor="{DynamicResource SecondaryTextColor}" />
-                                    <Label Text="{Binding Objetivo, StringFormat='Objetivo: {0}'}" FontSize="13"
+                                    <Label Text="{loc:TranslateFormat Key='Objetivo: {0}', Value={Binding Objetivo}}" FontSize="13"
                                            TextColor="{DynamicResource PrimaryTextColor}" />
-                                    <Label Text="{Binding RestricoesMedicas, Converter={StaticResource EnumDisplay}, StringFormat='Restrições: {0}'}"
+                                    <Label Text="{loc:TranslateFormat Key='Restrições: {0}', Value={Binding RestricoesMedicas, Converter={StaticResource EnumDisplay}}}"
                                            FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
-                                    <Label Text="{Binding ObservacoesRestricoes, StringFormat='Observações: {0}'}" FontSize="12"
+                                    <Label Text="{loc:TranslateFormat Key='Observações: {0}', Value={Binding ObservacoesRestricoes}}" FontSize="12"
                                            TextColor="{DynamicResource SecondaryTextColor}" />
                                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                                        <Button Text="Editar" Clicked="OnEditButtonClicked" CommandParameter="{Binding .}"
+                                        <Button Text="{loc:Translate Key='Editar'}" Clicked="OnEditButtonClicked" CommandParameter="{Binding .}"
                                                 BackgroundColor="{DynamicResource BrandSoftColor}" TextColor="{DynamicResource BrandDarkColor}"
                                                 CornerRadius="11" />
-                                        <Button Grid.Column="1" Text="Excluir" Clicked="OnDeleteButtonClicked" CommandParameter="{Binding .}"
+                                        <Button Grid.Column="1" Text="{loc:Translate Key='Excluir'}" Clicked="OnDeleteButtonClicked" CommandParameter="{Binding .}"
                                                 BackgroundColor="{DynamicResource SurfaceMutedColor}" TextColor="{DynamicResource PrimaryTextColor}"
                                                 CornerRadius="11" />
                                     </Grid>

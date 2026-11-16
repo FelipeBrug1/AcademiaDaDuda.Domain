@@ -5,6 +5,7 @@ using AcademiaDaDuda.Application.Interfaces;
 using AcademiaDaDuda.Presentation.AppMaui.Configuration;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using AcademiaDaDuda.Presentation.AppMaui.Localization;
 
 namespace AcademiaDaDuda.Presentation.AppMaui.ViewModels;
 
@@ -38,13 +39,13 @@ public partial class LogradouroViewModel : BaseViewModel
         }
     }
 
-    public string SaveButtonText => IsEditMode ? "Salvar alterações" : "Cadastrar logradouro";
+    public string SaveButtonText => LocalizationManager.Instance.Translate(IsEditMode ? "Salvar alterações" : "Cadastrar logradouro");
 
     public LogradouroViewModel(ILogradouroService logradouroService, DatabaseSettingsStartup databaseSettingsStartup)
     {
         _logradouroService = logradouroService;
         _databaseSettingsStartup = databaseSettingsStartup;
-        Title = "Novo logradouro";
+        SetTitle("Novo logradouro");
     }
 
     public async Task InitializeAsync()
@@ -52,13 +53,13 @@ public partial class LogradouroViewModel : BaseViewModel
         if (LogradouroId <= 0)
         {
             IsEditMode = false;
-            Title = "Novo logradouro";
+            SetTitle("Novo logradouro");
             Logradouro = NewLogradouro();
             return;
         }
 
         IsEditMode = true;
-        Title = "Editar logradouro";
+        SetTitle("Editar logradouro");
         try
         {
             IsBusy = true;
@@ -67,7 +68,7 @@ public partial class LogradouroViewModel : BaseViewModel
             var existing = await _logradouroService.ObterPorIdAsync(LogradouroId, cancellation.Token);
             if (existing is null)
             {
-                await Shell.Current.DisplayAlertAsync("Não encontrado", "O logradouro solicitado não existe mais.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Não encontrado", "O logradouro solicitado não existe mais.", "OK");
                 await Shell.Current.GoToAsync("..");
                 return;
             }
@@ -75,11 +76,11 @@ public partial class LogradouroViewModel : BaseViewModel
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "Não foi possível carregar os dados do logradouro a tempo.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "Não foi possível carregar os dados do logradouro a tempo.", "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro", $"Não foi possível carregar o logradouro. {exception.Message}", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro", global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizationManager.Instance.Format("Não foi possível carregar o logradouro. {0}", exception.Message), "OK");
         }
         finally
         {
@@ -93,7 +94,7 @@ public partial class LogradouroViewModel : BaseViewModel
         var cep = DigitsOnly(Logradouro.Cep);
         if (cep.Length != 8)
         {
-            await Shell.Current.DisplayAlertAsync("CEP inválido", "Informe os 8 dígitos do CEP para consultar.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("CEP inválido", "Informe os 8 dígitos do CEP para consultar.", "OK");
             return;
         }
 
@@ -105,23 +106,23 @@ public partial class LogradouroViewModel : BaseViewModel
             var existing = await _logradouroService.ObterPorCepAsync(cep, cancellation.Token);
             if (existing is null)
             {
-                await Shell.Current.DisplayAlertAsync("CEP disponível", "Nenhum cadastro foi encontrado com esse CEP. Você pode continuar o cadastro.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("CEP disponível", "Nenhum cadastro foi encontrado com esse CEP. Você pode continuar o cadastro.", "OK");
                 return;
             }
 
             Logradouro = existing;
             LogradouroId = existing.Id;
             IsEditMode = true;
-            Title = "Editar logradouro";
-            await Shell.Current.DisplayAlertAsync("CEP já cadastrado", "Os dados foram carregados para edição.", "OK");
+            SetTitle("Editar logradouro");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("CEP já cadastrado", "Os dados foram carregados para edição.", "OK");
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "A consulta do CEP demorou mais que o esperado.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "A consulta do CEP demorou mais que o esperado.", "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro na consulta", exception.Message, "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro na consulta", exception.Message, "OK");
         }
         finally
         {
@@ -138,7 +139,7 @@ public partial class LogradouroViewModel : BaseViewModel
         var errors = Validate(Logradouro);
         if (errors.Count > 0)
         {
-            await Shell.Current.DisplayAlertAsync("Revise os dados", string.Join(Environment.NewLine, errors), "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Revise os dados", string.Join(Environment.NewLine, errors), "OK");
             return;
         }
 
@@ -152,30 +153,30 @@ public partial class LogradouroViewModel : BaseViewModel
             if (IsEditMode)
             {
                 await _logradouroService.AtualizarAsync(Logradouro, cancellation.Token);
-                await Shell.Current.DisplayAlertAsync("Concluído", "Logradouro atualizado.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Concluído", "Logradouro atualizado.", "OK");
             }
             else
             {
                 await _logradouroService.AdicionarAsync(Logradouro, cancellation.Token);
-                await Shell.Current.DisplayAlertAsync("Concluído", "Logradouro cadastrado.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Concluído", "Logradouro cadastrado.", "OK");
             }
             await Shell.Current.GoToAsync("..");
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "Não foi possível salvar o logradouro a tempo.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "Não foi possível salvar o logradouro a tempo.", "OK");
         }
         catch (InvalidOperationException exception)
         {
-            await Shell.Current.DisplayAlertAsync("Regra de negócio", exception.Message, "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Regra de negócio", exception.Message, "OK");
         }
         catch (ArgumentException exception)
         {
-            await Shell.Current.DisplayAlertAsync("Dados inválidos", exception.Message, "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Dados inválidos", exception.Message, "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro ao salvar", exception.Message, "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro ao salvar", exception.Message, "OK");
         }
         finally
         {

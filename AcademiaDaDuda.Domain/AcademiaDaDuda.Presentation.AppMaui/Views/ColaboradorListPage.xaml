@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage
+<ContentPage xmlns:loc="clr-namespace:AcademiaDaDuda.Presentation.AppMaui.Localization"
     x:Class="AcademiaDaDuda.Presentation.AppMaui.Views.ColaboradorListPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
@@ -7,7 +7,7 @@
     xmlns:dto="clr-namespace:AcademiaDaDuda.Application.DTOs;assembly=AcademiaDaDuda.Application"
     xmlns:converters="clr-namespace:AcademiaDaDuda.Presentation.AppMaui.Converters"
     x:DataType="vm:ColaboradorListViewModel"
-    Title="Colaboradores"
+    Title="{loc:Translate Key='MenuColaboradores'}"
     BackgroundColor="{DynamicResource PageBackgroundColor}">
     <ContentPage.Resources>
         <converters:FotoToImageSourceConverter x:Key="FotoToImageSourceConverter" />
@@ -26,10 +26,10 @@
 
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
             <VerticalStackLayout Spacing="3" VerticalOptions="Center">
-                <Label Text="Colaboradores" FontSize="27" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
-                <Label Text="{Binding Colaboradores.Count, StringFormat='{0:N0} cadastros'}" FontSize="13" TextColor="{DynamicResource SecondaryTextColor}" />
+                <Label Text="{loc:Translate Key='MenuColaboradores'}" FontSize="27" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
+                <Label Text="{loc:TranslateFormat Key='{0:N0} cadastros', Value={Binding Colaboradores.Count}}" FontSize="13" TextColor="{DynamicResource SecondaryTextColor}" />
             </VerticalStackLayout>
-            <Button Grid.Column="1" Text="＋ Novo colaborador" Command="{Binding AddColaboradorCommand}"
+            <Button Grid.Column="1" Text="{loc:Translate Key='＋ Novo colaborador'}" Command="{Binding AddColaboradorCommand}"
                     BackgroundColor="{DynamicResource BrandColor}" TextColor="White" FontAttributes="Bold"
                     VerticalOptions="Center" CornerRadius="14" />
         </Grid>
@@ -37,16 +37,16 @@
         <Border Grid.Row="1" Padding="10" BackgroundColor="{DynamicResource SurfaceColor}"
                 Stroke="{DynamicResource BorderColor}" StrokeShape="RoundRectangle 16">
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
-                <Picker Title="Campo" WidthRequest="100" ItemsSource="{Binding FilterTypes}"
-                        SelectedItem="{Binding SelectedFilterType}" FontSize="13"
+                <Picker Title="{loc:Translate Key='Campo'}" WidthRequest="100" ItemsSource="{Binding FilterTypes}"
+                        ItemDisplayBinding="{Binding DisplayName}" SelectedItem="{Binding SelectedFilterType}" FontSize="13"
                         TextColor="{DynamicResource PrimaryTextColor}" />
-                <Entry Grid.Column="1" Text="{Binding SearchText}" Placeholder="Buscar colaborador"
+                <Entry Grid.Column="1" Text="{Binding SearchText}" Placeholder="{loc:Translate Key='Buscar colaborador'}"
                        ReturnType="Search" ReturnCommand="{Binding SearchColaboradoresCommand}"
                        TextChanged="OnSearchDebounceTextChanged"
                        ClearButtonVisibility="WhileEditing" VerticalOptions="Center" />
                 <Button Grid.Column="2" Text="⌕" Command="{Binding SearchColaboradoresCommand}"
                         BackgroundColor="{DynamicResource BrandSoftColor}" TextColor="{DynamicResource BrandDarkColor}"
-                        CornerRadius="12" Padding="14,8" SemanticProperties.Hint="Buscar colaboradores" />
+                        CornerRadius="12" Padding="14,8" SemanticProperties.Hint="{loc:Translate Key='Buscar colaboradores'}" />
             </Grid>
         </Border>
 
@@ -69,11 +69,11 @@
                     </CollectionView.ItemsLayout>
                     <CollectionView.EmptyView>
                         <VerticalStackLayout Padding="25" Spacing="10" VerticalOptions="Center">
-                            <Label Text="Nenhum colaborador encontrado" FontSize="18" FontAttributes="Bold"
+                            <Label Text="{loc:Translate Key='Nenhum colaborador encontrado'}" FontSize="18" FontAttributes="Bold"
                                    TextColor="{DynamicResource PrimaryTextColor}" HorizontalTextAlignment="Center" />
-                            <Label Text="Cadastre um colaborador ou altere os filtros da busca."
+                            <Label Text="{loc:Translate Key='Cadastre um colaborador ou altere os filtros da busca.'}"
                                    FontSize="14" TextColor="{DynamicResource SecondaryTextColor}" HorizontalTextAlignment="Center" />
-                            <Button Text="Cadastrar primeiro colaborador" Command="{Binding AddColaboradorCommand}"
+                            <Button Text="{loc:Translate Key='Cadastrar primeiro colaborador'}" Command="{Binding AddColaboradorCommand}"
                                     BackgroundColor="{DynamicResource BrandColor}" TextColor="White"
                                     CornerRadius="12" HorizontalOptions="Center" />
                         </VerticalStackLayout>
@@ -85,7 +85,7 @@
                                 <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="10">
                                     <Image Grid.RowSpan="2" Source="{Binding Foto, Converter={StaticResource FotoToImageSourceConverter}}"
                                            Aspect="AspectFill" BackgroundColor="{DynamicResource SurfaceMutedColor}"
-                                           SemanticProperties.Description="Foto do colaborador">
+                                           SemanticProperties.Description="{loc:Translate Key='Foto do colaborador'}">
                                         <Image.WidthRequest>
                                             <OnIdiom x:TypeArguments="x:Double">
                                                 <OnIdiom.Phone>72</OnIdiom.Phone>
@@ -104,19 +104,20 @@
                                         </Image.HeightRequest>
                                     </Image>
                                     <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                        <Label Text="{loc:TranslateFormat Key='ID: {0}', Value={Binding Id}}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
                                         <Label Text="{Binding Nome}" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}" />
-                                        <Label Text="{Binding Cpf, StringFormat='CPF: {0}'}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
-                                        <Label Text="{Binding Telefone, StringFormat='Telefone: {0}'}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
-                                        <Label Text="{Binding Email, StringFormat='E-mail: {0}'}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
-                                        <Label Text="{Binding DataAdmissao, StringFormat='Admissão: {0:dd/MM/yyyy}'}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
-                                        <Label Text="{Binding Tipo, Converter={StaticResource EnumDisplay}, StringFormat='Cargo: {0}'}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
-                                        <Label Text="{Binding Vinculo, Converter={StaticResource EnumDisplay}, StringFormat='Vínculo: {0}'}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
-                                        <Label Text="{Binding Endereco.Cidade, StringFormat='Cidade: {0}'}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
+                                        <Label Text="{loc:TranslateFormat Key='CPF: {0}', Value={Binding Cpf}}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
+                                        <Label Text="{loc:TranslateFormat Key='Telefone: {0}', Value={Binding Telefone}}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
+                                        <Label Text="{loc:TranslateFormat Key='E-mail: {0}', Value={Binding Email}}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
+                                        <Label Text="{loc:TranslateFormat Key='Admissão: {0:d}', Value={Binding DataAdmissao}}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
+                                        <Label Text="{loc:TranslateFormat Key='Cargo: {0}', Value={Binding Tipo, Converter={StaticResource EnumDisplay}}}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
+                                        <Label Text="{loc:TranslateFormat Key='Vínculo: {0}', Value={Binding Vinculo, Converter={StaticResource EnumDisplay}}}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
+                                        <Label Text="{loc:TranslateFormat Key='Cidade: {0}', Value={Binding Endereco.Cidade}}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}" />
                                     </VerticalStackLayout>
                                     <HorizontalStackLayout Grid.Row="1" Grid.ColumnSpan="2" Spacing="8" HorizontalOptions="End">
-                                        <Button Text="Editar" Clicked="OnEditColaboradorClicked" BackgroundColor="{DynamicResource BrandSoftColor}"
+                                        <Button Text="{loc:Translate Key='Editar'}" Clicked="OnEditColaboradorClicked" BackgroundColor="{DynamicResource BrandSoftColor}"
                                                 TextColor="{DynamicResource BrandDarkColor}" CornerRadius="10" Padding="12,7" />
-                                        <Button Text="Excluir" Clicked="OnDeleteColaboradorClicked" BackgroundColor="{DynamicResource DangerSoftColor}"
+                                        <Button Text="{loc:Translate Key='Excluir'}" Clicked="OnDeleteColaboradorClicked" BackgroundColor="{DynamicResource DangerSoftColor}"
                                                 TextColor="{DynamicResource DangerColor}" CornerRadius="10" Padding="12,7" />
                                     </HorizontalStackLayout>
                                 </Grid>

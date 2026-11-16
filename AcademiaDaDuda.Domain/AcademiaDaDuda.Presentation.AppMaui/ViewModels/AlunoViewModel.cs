@@ -4,6 +4,7 @@ using AcademiaDaDuda.Presentation.AppMaui.Configuration;
 using AcademiaDaDuda.Presentation.AppMaui.Converters;
 using AcademiaDaDuda.Presentation.AppMaui.Services;
 using CommunityToolkit.Mvvm.Input;
+using AcademiaDaDuda.Presentation.AppMaui.Localization;
 
 namespace AcademiaDaDuda.Presentation.AppMaui.ViewModels;
 
@@ -51,7 +52,7 @@ public partial class AlunoViewModel : BaseViewModel
         }
     }
 
-    public string SaveButtonText => IsEditMode ? "Salvar alterações" : "Cadastrar aluno";
+    public string SaveButtonText => LocalizationManager.Instance.Translate(IsEditMode ? "Salvar alterações" : "Cadastrar aluno");
 
     public string ConfirmarSenha
     {
@@ -70,7 +71,7 @@ public partial class AlunoViewModel : BaseViewModel
         _alunoService = alunoService;
         _logradouroService = logradouroService;
         _databaseSettingsStartup = databaseSettingsStartup;
-        Title = "Novo aluno";
+        SetTitle("Novo aluno");
     }
 
     public async Task InitializeAsync()
@@ -83,13 +84,13 @@ public partial class AlunoViewModel : BaseViewModel
         if (AlunoId > 0)
         {
             IsEditMode = true;
-            Title = "Editar aluno";
+            SetTitle("Editar aluno");
             await LoadAlunoAsync();
             return;
         }
 
         IsEditMode = false;
-        Title = "Novo aluno";
+        SetTitle("Novo aluno");
         Aluno = NewAluno();
         NotifyAddressState();
     }
@@ -111,7 +112,7 @@ public partial class AlunoViewModel : BaseViewModel
             var existing = await _alunoService.ObterPorIdAsync(AlunoId, cancellation.Token);
             if (existing is null)
             {
-                await Shell.Current.DisplayAlertAsync("Não encontrado", "O aluno solicitado não existe mais.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Não encontrado", "O aluno solicitado não existe mais.", "OK");
                 await Shell.Current.GoToAsync("..");
                 return;
             }
@@ -124,11 +125,11 @@ public partial class AlunoViewModel : BaseViewModel
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "Não foi possível carregar os dados do aluno a tempo.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "Não foi possível carregar os dados do aluno a tempo.", "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro ao carregar", $"Não foi possível carregar o aluno. {exception.Message}", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro ao carregar", global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizationManager.Instance.Format("Não foi possível carregar o aluno. {0}", exception.Message), "OK");
         }
         finally
         {
@@ -142,7 +143,7 @@ public partial class AlunoViewModel : BaseViewModel
         var cpf = PessoaFormValidation.DigitsOnly(Aluno.Cpf);
         if (cpf.Length != 11)
         {
-            await Shell.Current.DisplayAlertAsync("CPF inválido", "Informe os 11 dígitos do CPF para consultar.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("CPF inválido", "Informe os 11 dígitos do CPF para consultar.", "OK");
             return;
         }
 
@@ -154,14 +155,14 @@ public partial class AlunoViewModel : BaseViewModel
             var found = await _alunoService.ObterPorCpfAsync(cpf, cancellation.Token);
             if (found is null)
             {
-                await Shell.Current.DisplayAlertAsync("Aluno não encontrado", "Nenhum cadastro foi localizado com esse CPF.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Aluno não encontrado", "Nenhum cadastro foi localizado com esse CPF.", "OK");
                 return;
             }
 
             var fullRecord = await _alunoService.ObterPorIdAsync(found.Id, cancellation.Token);
             if (fullRecord is null)
             {
-                await Shell.Current.DisplayAlertAsync("Aluno não encontrado", "Não foi possível carregar os dados completos desse cadastro.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Aluno não encontrado", "Não foi possível carregar os dados completos desse cadastro.", "OK");
                 return;
             }
 
@@ -169,19 +170,19 @@ public partial class AlunoViewModel : BaseViewModel
             fullRecord.Senha = string.Empty;
             AlunoId = fullRecord.Id;
             IsEditMode = true;
-            Title = "Editar aluno";
+            SetTitle("Editar aluno");
             Aluno = fullRecord;
             ConfirmarSenha = string.Empty;
             NotifyAddressState();
-            await Shell.Current.DisplayAlertAsync("Cadastro localizado", "Os dados foram carregados para edição.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Cadastro localizado", "Os dados foram carregados para edição.", "OK");
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "A busca por CPF demorou mais que o esperado.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "A busca por CPF demorou mais que o esperado.", "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro na busca", exception.Message, "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro na busca", exception.Message, "OK");
         }
         finally
         {
@@ -195,7 +196,7 @@ public partial class AlunoViewModel : BaseViewModel
         var cep = PessoaFormValidation.DigitsOnly(Aluno.Endereco?.Cep);
         if (cep.Length != 8)
         {
-            await Shell.Current.DisplayAlertAsync("CEP inválido", "Informe os 8 dígitos do CEP para consultar.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("CEP inválido", "Informe os 8 dígitos do CEP para consultar.", "OK");
             return;
         }
 
@@ -207,22 +208,22 @@ public partial class AlunoViewModel : BaseViewModel
             var address = await _logradouroService.ObterPorCepAsync(cep, cancellation.Token);
             if (address is null)
             {
-                await Shell.Current.DisplayAlertAsync("Logradouro não encontrado", "Cadastre esse CEP na opção Logradouros antes de salvar o aluno.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Logradouro não encontrado", "Cadastre esse CEP na opção Logradouros antes de salvar o aluno.", "OK");
                 return;
             }
 
             Aluno.Endereco = address;
             OnPropertyChanged(nameof(Aluno));
             NotifyAddressState();
-            await Shell.Current.DisplayAlertAsync("CEP encontrado", "O endereço cadastrado foi vinculado ao aluno.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("CEP encontrado", "O endereço cadastrado foi vinculado ao aluno.", "OK");
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "A consulta do CEP demorou mais que o esperado.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "A consulta do CEP demorou mais que o esperado.", "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro na consulta", exception.Message, "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro na consulta", exception.Message, "OK");
         }
         finally
         {
@@ -235,12 +236,12 @@ public partial class AlunoViewModel : BaseViewModel
     {
         try
         {
-            var choice = await Shell.Current.DisplayActionSheetAsync("Foto do aluno", "Cancelar", null, "Galeria", "Câmera");
+            var choice = await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayActionSheetAsync("Foto do aluno", "Cancelar", null, "Galeria", "Câmera");
             FileResult? photo = choice switch
             {
                 "Galeria" => await FilePicker.Default.PickAsync(new PickOptions
                 {
-                    PickerTitle = "Selecione uma foto",
+                    PickerTitle = global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizationManager.Instance.Translate("Selecione uma foto"),
                     FileTypes = FilePickerFileType.Images
                 }),
                 "Câmera" => await PhotoCaptureService.CapturePhotoAsync(),
@@ -259,7 +260,7 @@ public partial class AlunoViewModel : BaseViewModel
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro ao selecionar foto", exception.Message, "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro ao selecionar foto", exception.Message, "OK");
         }
     }
 
@@ -272,7 +273,7 @@ public partial class AlunoViewModel : BaseViewModel
         var errors = PessoaFormValidation.Validate(Aluno, IsEditMode, ConfirmarSenha);
         if (errors.Count > 0)
         {
-            await Shell.Current.DisplayAlertAsync("Revise os dados", string.Join(Environment.NewLine, errors.Select(error => $"• {error}")), "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Revise os dados", string.Join(Environment.NewLine, errors.Select(error => $"• {error}")), "OK");
             return;
         }
 
@@ -286,7 +287,7 @@ public partial class AlunoViewModel : BaseViewModel
             var address = await _logradouroService.ObterPorCepAsync(cep, cancellation.Token);
             if (address is null)
             {
-                await Shell.Current.DisplayAlertAsync("Endereço obrigatório", "O CEP informado não está cadastrado em Logradouros. Cadastre-o antes de salvar o aluno.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Endereço obrigatório", "O CEP informado não está cadastrado em Logradouros. Cadastre-o antes de salvar o aluno.", "OK");
                 return;
             }
 
@@ -303,23 +304,23 @@ public partial class AlunoViewModel : BaseViewModel
             if (IsEditMode)
             {
                 await _alunoService.AtualizarAsync(Aluno, cancellation.Token);
-                await Shell.Current.DisplayAlertAsync("Concluído", "Aluno atualizado com sucesso.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Concluído", "Aluno atualizado com sucesso.", "OK");
             }
             else
             {
                 await _alunoService.AdicionarAsync(Aluno, cancellation.Token);
-                await Shell.Current.DisplayAlertAsync("Concluído", "Aluno cadastrado com sucesso.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Concluído", "Aluno cadastrado com sucesso.", "OK");
             }
 
             await Shell.Current.GoToAsync("..");
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "Não foi possível salvar o aluno a tempo.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "Não foi possível salvar o aluno a tempo.", "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro ao salvar", exception.Message, "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro ao salvar", exception.Message, "OK");
         }
         finally
         {

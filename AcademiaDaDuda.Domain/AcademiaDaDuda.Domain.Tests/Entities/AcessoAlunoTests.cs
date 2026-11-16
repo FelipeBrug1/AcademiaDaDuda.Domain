@@ -42,17 +42,18 @@ public class AcessoAlunoTests
         }
     }
 
-    [Theory(DisplayName = "AcessoAluno: horario fora do intervalo -> DATA_HORA_INTERVALO_INVALIDO")]
+    [Theory(DisplayName = "AcessoAluno: registra em qualquer horário")]
+    [InlineData(0, 0)]
     [InlineData(5, 59)]
     [InlineData(22, 1)]
-    public void Deve_Falhar_Criacao_Quando_HorarioForaDoIntervalo(int hour, int minute)
+    [InlineData(23, 59)]
+    public void Deve_Criar_Com_Sucesso_Em_QualquerHorario(int hour, int minute)
     {
         var aluno = GetValidAluno();
         var dataHora = DateTime.Today.AddHours(hour).AddMinutes(minute);
         var result = AcessoAluno.Criar(1, aluno, dataHora);
-        Assert.True(result.IsFailure);
-        Assert.NotEmpty(result.Notifications);
-        Assert.Contains(result.Notifications, n => n.Mensagem == "DATA_HORA_INTERVALO_INVALIDO");
+        Assert.True(result.IsSuccess);
+        Assert.Equal(dataHora, result.Value!.DataHora);
     }
 
     [Theory(DisplayName = "AcessoAluno: criação bem-sucedida em horários permitidos")]
@@ -68,14 +69,4 @@ public class AcessoAlunoTests
         Assert.Equal(dataHora, result.Value.DataHora);
     }
 
-    [Theory(DisplayName = "AcessoAluno: permite horários de borda 06:00 e 22:00")]
-    [InlineData(6)]
-    [InlineData(22)]
-    public void Deve_Permitir_HorariosDeBorda_06_00_e_22_00(int hour)
-    {
-        var aluno = GetValidAluno();
-        var time = DateTime.Today.AddHours(hour);
-        var r = AcessoAluno.Criar(1, aluno, time);
-        Assert.True(r.IsSuccess);
-    }
 }

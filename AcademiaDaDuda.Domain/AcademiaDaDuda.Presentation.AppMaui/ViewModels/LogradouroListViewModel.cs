@@ -6,6 +6,7 @@ using AcademiaDaDuda.Presentation.AppMaui.Configuration;
 using AcademiaDaDuda.Presentation.AppMaui.Views;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using AcademiaDaDuda.Presentation.AppMaui.Localization;
 
 namespace AcademiaDaDuda.Presentation.AppMaui.ViewModels;
 
@@ -15,10 +16,11 @@ public partial class LogradouroListViewModel : BaseViewModel
     private readonly DatabaseSettingsStartup _databaseSettingsStartup;
 
     public ObservableCollection<LogradouroDto> Logradouros { get; } = new();
-    public ObservableCollection<string> TiposDeBusca { get; } = new() { "Todos", "Cidade", "ID", "CEP" };
+    public ObservableCollection<LocalizedOption> TiposDeBusca { get; } =
+        [new("Todos"), new("Cidade"), new("ID"), new("CEP")];
 
     private string _textoBusca = string.Empty;
-    private string _tipoDeBusca = "Todos";
+    private LocalizedOption _tipoDeBusca = null!;
 
     public string TextoBusca
     {
@@ -26,7 +28,7 @@ public partial class LogradouroListViewModel : BaseViewModel
         set => SetProperty(ref _textoBusca, value);
     }
 
-    public string TipoDeBusca
+    public LocalizedOption TipoDeBusca
     {
         get => _tipoDeBusca;
         set => SetProperty(ref _tipoDeBusca, value);
@@ -36,7 +38,8 @@ public partial class LogradouroListViewModel : BaseViewModel
     {
         _logradouroService = logradouroService;
         _databaseSettingsStartup = databaseSettingsStartup;
-        Title = "Logradouros";
+        TipoDeBusca = TiposDeBusca[0];
+        SetTitle("Logradouros");
     }
 
     [RelayCommand]
@@ -53,11 +56,11 @@ public partial class LogradouroListViewModel : BaseViewModel
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "O carregamento demorou mais que o esperado. Tente novamente.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "O carregamento demorou mais que o esperado. Tente novamente.", "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro", $"Não foi possível carregar os logradouros. {exception.Message}", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro", global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizationManager.Instance.Format("Não foi possível carregar os logradouros. {0}", exception.Message), "OK");
         }
         finally
         {
@@ -79,12 +82,12 @@ public partial class LogradouroListViewModel : BaseViewModel
             var term = TextoBusca.Trim();
             IEnumerable<LogradouroDto> results;
 
-            switch (TipoDeBusca)
+            switch (TipoDeBusca.Key)
             {
                 case "ID":
                     if (!int.TryParse(term, out var id) || id <= 0)
                     {
-                        await Shell.Current.DisplayAlertAsync("Busca", "Informe um ID numérico maior que zero.", "OK");
+                        await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Busca", "Informe um ID numérico maior que zero.", "OK");
                         return;
                     }
                     var byId = await _logradouroService.ObterPorIdAsync(id, cancellation.Token);
@@ -95,7 +98,7 @@ public partial class LogradouroListViewModel : BaseViewModel
                     var cep = DigitsOnly(term);
                     if (cep.Length != 8)
                     {
-                        await Shell.Current.DisplayAlertAsync("Busca", "Informe os 8 dígitos do CEP.", "OK");
+                        await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Busca", "Informe os 8 dígitos do CEP.", "OK");
                         return;
                     }
                     var byCep = await _logradouroService.ObterPorCepAsync(cep, cancellation.Token);
@@ -126,11 +129,11 @@ public partial class LogradouroListViewModel : BaseViewModel
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "A busca demorou mais que o esperado. Tente novamente.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "A busca demorou mais que o esperado. Tente novamente.", "OK");
         }
         catch (Exception exception)
         {
-            await Shell.Current.DisplayAlertAsync("Erro na busca", exception.Message, "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro na busca", exception.Message, "OK");
         }
         finally
         {
@@ -162,9 +165,9 @@ public partial class LogradouroListViewModel : BaseViewModel
         if (logradouro is null || IsBusy)
             return;
 
-        var confirmed = await Shell.Current.DisplayAlertAsync(
+        var confirmed = await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync(
             "Excluir logradouro",
-            $"Deseja excluir “{logradouro.Nome}”, CEP {logradouro.Cep}?",
+            global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizationManager.Instance.Format("Deseja excluir “{0}”, CEP {1}?", logradouro.Nome, logradouro.Cep),
             "Excluir",
             "Cancelar");
         if (!confirmed)
@@ -178,24 +181,24 @@ public partial class LogradouroListViewModel : BaseViewModel
             if (await _logradouroService.RemoverAsync(logradouro.Id, cancellation.Token))
             {
                 Logradouros.Remove(logradouro);
-                await Shell.Current.DisplayAlertAsync("Concluído", "Logradouro excluído.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Concluído", "Logradouro excluído.", "OK");
             }
             else
             {
-                await Shell.Current.DisplayAlertAsync("Não encontrado", "Esse logradouro já foi removido.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Não encontrado", "Esse logradouro já foi removido.", "OK");
                 await LoadLogradourosAsync();
             }
         }
         catch (OperationCanceledException)
         {
-            await Shell.Current.DisplayAlertAsync("Tempo esgotado", "A exclusão demorou mais que o esperado.", "OK");
+            await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Tempo esgotado", "A exclusão demorou mais que o esperado.", "OK");
         }
         catch (Exception exception)
         {
             if (HasForeignKeyError(exception))
-                await Shell.Current.DisplayAlertAsync("Exclusão não permitida", "Este logradouro está vinculado a um aluno ou colaborador e não pode ser removido.", "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Exclusão não permitida", "Este logradouro está vinculado a um aluno ou colaborador e não pode ser removido.", "OK");
             else
-                await Shell.Current.DisplayAlertAsync("Erro ao excluir", exception.Message, "OK");
+                await global::AcademiaDaDuda.Presentation.AppMaui.Localization.LocalizedAlerts.DisplayAlertAsync("Erro ao excluir", exception.Message, "OK");
         }
         finally
         {
